@@ -608,9 +608,9 @@
 
         <div class="header-actions">
             <button class="icon-btn" onclick="openDM()" title="Messages">💬</button>
-            <button class="icon-btn" title="Games">👤</button>
-            <button class="icon-btn" title="Notifications">🔔</button>
-            <button class="icon-btn" title="Favorites">💖</button>
+            <button class="icon-btn" onclick="openNotifications()" title="Notifications" id="notificationBtn">🔔</button>
+            <button class="icon-btn" onclick="openUserSearch()" title="Search Users">👤</button>
+            <button class="icon-btn" onclick="navigateToSection('favorites')" title="Favorites">💖</button>
             <button class="btn-login" id="headerBtn" onclick="openModal('loginModal')">Log in</button>
         </div>
     </header>
@@ -934,6 +934,78 @@
         </div>
     </div>
 
+    <!-- 알림 모달 -->
+    <div id="notificationsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Notifications</h2>
+                <button class="close-btn" onclick="closeModal('notificationsModal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <div id="notificationsList"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 유저 검색 모달 -->
+    <div id="userSearchModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Search Users</h2>
+                <button class="close-btn" onclick="closeModal('userSearchModal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <input type="text" class="form-input" id="userSearchInput" placeholder="Search by username...">
+                </div>
+                <div id="userSearchResults"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 다른 유저 프로필 모달 -->
+    <div id="otherUserProfileModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="otherUserProfileTitle">User Profile</h2>
+                <button class="close-btn" onclick="closeModal('otherUserProfileModal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <div style="width: 100px; height: 100px; border-radius: 50%; background: linear-gradient(135deg, #7c3aed, #a855f7); margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; font-size: 40px;" id="otherUserAvatar">👤</div>
+                    <h2 id="otherUsername" style="font-size: 24px; margin-bottom: 10px;">User</h2>
+                    <p id="otherUserBio" style="color: #8b949e; margin-bottom: 20px;">No bio</p>
+                    
+                    <div style="display: flex; gap: 20px; justify-content: center; margin-bottom: 20px;">
+                        <div style="text-align: center;">
+                            <div style="font-size: 20px; font-weight: 700;" id="otherFollowerCount">0</div>
+                            <div style="color: #8b949e; font-size: 12px;">Followers</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 20px; font-weight: 700;" id="otherFollowingCount">0</div>
+                            <div style="color: #8b949e; font-size: 12px;">Following</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 20px; font-weight: 700;" id="otherGameCount">0</div>
+                            <div style="color: #8b949e; font-size: 12px;">Games</div>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                        <button class="btn btn-primary" id="followBtn" onclick="followUser()">Follow</button>
+                        <button class="btn btn-secondary" id="friendBtn" onclick="sendFriendRequestToUser()">Add Friend</button>
+                        <button class="btn btn-secondary" onclick="startDMWithUser()">Message</button>
+                    </div>
+                </div>
+                
+                <div class="section-header">
+                    <h2 class="section-title">Games</h2>
+                </div>
+                <div class="games-grid" id="otherUserGames"></div>
+            </div>
+        </div>
+    </div>
+
     <script>
         const sb = window.supabase.createClient(
             'https://alnazztrdhpkyclkaklv.supabase.co',
@@ -1145,6 +1217,9 @@
                     await loadUserProfile();
                     const myGames = games.filter(g => g.user_id === currentUser.id);
                     displayGames(myGames, 'profileGames');
+                    
+                    // 알림 확인
+                    await loadNotifications();
                 }
             }
         }
@@ -1663,6 +1738,243 @@
         // DM 기능
         let currentConversation = null;
         let currentRecipient = null;
+        let currentViewingUser = null;
+
+        // 알림 기능
+        async function openNotifications() {
+            if (!currentUser) {
+                showNotification('Please log in first!');
+                openModal('loginModal');
+                return;
+            }
+
+            await loadNotifications();
+            openModal('notificationsModal');
+        }
+
+        async function loadNotifications() {
+            // 친구 요청 가져오기
+            const { data: friendRequests } = await sb
+                .from('friendships')
+                .select('*, requester:profiles!friendships_user1_id_fkey(username)')
+                .eq('user2_id', currentUser.id)
+                .eq('status', 'pending');
+
+            const notificationsList = document.getElementById('notificationsList');
+
+            if (!friendRequests || friendRequests.length === 0) {
+                notificationsList.innerHTML = '<p style="text-align: center; color: #8b949e; padding: 40px;">No notifications</p>';
+                return;
+            }
+
+            notificationsList.innerHTML = friendRequests.map(req => `
+                <div style="background: rgba(124, 58, 237, 0.1); border: 1px solid #7c3aed; border-radius: 12px; padding: 20px; margin-bottom: 15px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-weight: 600; margin-bottom: 5px;">Friend Request</div>
+                            <div style="color: #8b949e; font-size: 14px;">
+                                <span style="color: #7c3aed; font-weight: 600;">${req.requester.username}</span> sent you a friend request
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn btn-primary" onclick="acceptFriendRequest('${req.id}')">Accept</button>
+                            <button class="btn btn-secondary" onclick="rejectFriendRequest('${req.id}')">Reject</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            // 알림 뱃지 표시
+            if (friendRequests.length > 0) {
+                document.getElementById('notificationBtn').innerHTML = '🔔<span style="position: absolute; top: 5px; right: 5px; width: 8px; height: 8px; background: #ef4444; border-radius: 50%;"></span>';
+            }
+        }
+
+        async function acceptFriendRequest(requestId) {
+            await sb.from('friendships').update({ status: 'accepted' }).eq('id', requestId);
+            showNotification('Friend request accepted! 🤝');
+            await loadNotifications();
+        }
+
+        async function rejectFriendRequest(requestId) {
+            await sb.from('friendships').delete().eq('id', requestId);
+            showNotification('Friend request rejected');
+            await loadNotifications();
+        }
+
+        // 유저 검색 기능
+        async function openUserSearch() {
+            if (!currentUser) {
+                showNotification('Please log in first!');
+                openModal('loginModal');
+                return;
+            }
+
+            openModal('userSearchModal');
+            
+            document.getElementById('userSearchInput').addEventListener('input', async (e) => {
+                const query = e.target.value.trim();
+                if (query.length < 2) {
+                    document.getElementById('userSearchResults').innerHTML = '';
+                    return;
+                }
+
+                const { data: users } = await sb
+                    .from('profiles')
+                    .select('id, username, bio')
+                    .ilike('username', `%${query}%`)
+                    .neq('id', currentUser.id)
+                    .limit(20);
+
+                const results = document.getElementById('userSearchResults');
+
+                if (!users || users.length === 0) {
+                    results.innerHTML = '<p style="text-align: center; color: #8b949e; padding: 20px;">No users found</p>';
+                    return;
+                }
+
+                results.innerHTML = users.map(user => `
+                    <div onclick="viewUserProfile('${user.id}')" style="padding: 15px; background: rgba(255, 255, 255, 0.03); border-radius: 10px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='rgba(255,255,255,0.03)'">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #7c3aed, #a855f7); display: flex; align-items: center; justify-content: center; font-size: 18px;">
+                                ${user.username[0].toUpperCase()}
+                            </div>
+                            <div style="flex: 1;">
+                                <div style="font-weight: 600; margin-bottom: 3px;">${user.username}</div>
+                                <div style="font-size: 13px; color: #8b949e;">${user.bio || 'No bio'}</div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            });
+        }
+
+        // 유저 프로필 보기
+        async function viewUserProfile(userId) {
+            closeModal('userSearchModal');
+            currentViewingUser = userId;
+
+            // 프로필 정보 가져오기
+            const { data: profile } = await sb.from('profiles').select('*').eq('id', userId).single();
+
+            if (!profile) {
+                showNotification('User not found');
+                return;
+            }
+
+            document.getElementById('otherUserProfileTitle').textContent = profile.username;
+            document.getElementById('otherUsername').textContent = profile.username;
+            document.getElementById('otherUserBio').textContent = profile.bio || 'No bio';
+            document.getElementById('otherUserAvatar').textContent = profile.username[0].toUpperCase();
+
+            // 팔로워/팔로잉 수
+            const { data: followers } = await sb.from('follows').select('follower_id').eq('following_id', userId);
+            const { data: following } = await sb.from('follows').select('following_id').eq('follower_id', userId);
+
+            document.getElementById('otherFollowerCount').textContent = followers?.length || 0;
+            document.getElementById('otherFollowingCount').textContent = following?.length || 0;
+
+            // 게임 수
+            const { data: games } = await sb.from('games').select('*').eq('user_id', userId);
+            document.getElementById('otherGameCount').textContent = games?.length || 0;
+            displayGames(games || [], 'otherUserGames');
+
+            // 팔로우 상태 확인
+            const { data: isFollowing } = await sb
+                .from('follows')
+                .select('*')
+                .eq('follower_id', currentUser.id)
+                .eq('following_id', userId)
+                .single();
+
+            document.getElementById('followBtn').textContent = isFollowing ? 'Unfollow' : 'Follow';
+
+            // 친구 상태 확인
+            const { data: friendship } = await sb
+                .from('friendships')
+                .select('*')
+                .or(`and(user1_id.eq.${Math.min(currentUser.id, userId)},user2_id.eq.${Math.max(currentUser.id, userId)})`)
+                .single();
+
+            const friendBtn = document.getElementById('friendBtn');
+            if (friendship) {
+                if (friendship.status === 'pending') {
+                    friendBtn.textContent = 'Pending';
+                    friendBtn.disabled = true;
+                } else if (friendship.status === 'accepted') {
+                    friendBtn.textContent = 'Friends ✓';
+                    friendBtn.disabled = true;
+                }
+            } else {
+                friendBtn.textContent = 'Add Friend';
+                friendBtn.disabled = false;
+            }
+
+            openModal('otherUserProfileModal');
+        }
+
+        async function followUser() {
+            if (!currentViewingUser) return;
+
+            const { data: existing } = await sb
+                .from('follows')
+                .select('*')
+                .eq('follower_id', currentUser.id)
+                .eq('following_id', currentViewingUser)
+                .single();
+
+            if (existing) {
+                await sb.from('follows').delete().eq('id', existing.id);
+                document.getElementById('followBtn').textContent = 'Follow';
+                showNotification('Unfollowed');
+            } else {
+                await sb.from('follows').insert([{
+                    follower_id: currentUser.id,
+                    following_id: currentViewingUser
+                }]);
+                document.getElementById('followBtn').textContent = 'Unfollow';
+                showNotification('Following! 👥');
+            }
+
+            // 카운트 업데이트
+            const { data: followers } = await sb.from('follows').select('follower_id').eq('following_id', currentViewingUser);
+            document.getElementById('otherFollowerCount').textContent = followers?.length || 0;
+        }
+
+        async function sendFriendRequestToUser() {
+            if (!currentViewingUser) return;
+
+            const user1 = Math.min(currentUser.id, currentViewingUser);
+            const user2 = Math.max(currentUser.id, currentViewingUser);
+
+            const { error } = await sb.from('friendships').insert([{
+                user1_id: user1,
+                user2_id: user2,
+                status: 'pending'
+            }]);
+
+            if (error) {
+                showNotification('Already sent or already friends!');
+            } else {
+                document.getElementById('friendBtn').textContent = 'Pending';
+                document.getElementById('friendBtn').disabled = true;
+                showNotification('Friend request sent! 🤝');
+            }
+        }
+
+        async function startDMWithUser() {
+            if (!currentViewingUser) return;
+
+            closeModal('otherUserProfileModal');
+            
+            const { data: profile } = await sb.from('profiles').select('username').eq('id', currentViewingUser).single();
+            
+            if (profile) {
+                currentRecipient = { id: currentViewingUser, username: profile.username };
+                await openDM();
+                await openConversation(currentViewingUser, profile.username);
+            }
+        }
 
         async function openDM() {
             if (!currentUser) {
