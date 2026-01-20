@@ -1753,41 +1753,59 @@
         }
 
         async function loadNotifications() {
-            // 친구 요청 가져오기
-            const { data: friendRequests } = await sb
+            if (!currentUser) return;
+
+            // 친구 요청 가져오기 - 내가 user2이거나 user1인 경우 모두 확인
+            const { data: friendRequests, error } = await sb
                 .from('friendships')
-                .select('*, requester:profiles!friendships_user1_id_fkey(username)')
-                .eq('user2_id', currentUser.id)
+                .select('*, user1:profiles!friendships_user1_id_fkey(username), user2:profiles!friendships_user2_id_fkey(username)')
+                .or(`user1_id.eq.${currentUser.id},user2_id.eq.${currentUser.id}`)
                 .eq('status', 'pending');
+
+            console.log('Friend requests:', friendRequests, 'Error:', error);
 
             const notificationsList = document.getElementById('notificationsList');
 
-            if (!friendRequests || friendRequests.length === 0) {
+            // 나에게 온 요청만 필터링
+            const myRequests = friendRequests?.filter(req => {
+                // 내가 user2이면서 user1이 요청자인 경우
+                if (req.user2_id === currentUser.id) return true;
+                // 내가 user1이면서 user2가 요청자인 경우 (잘못된 케이스지만 방어)
+                return false;
+            }) || [];
+
+            if (myRequests.length === 0) {
                 notificationsList.innerHTML = '<p style="text-align: center; color: #8b949e; padding: 40px;">No notifications</p>';
+                
+                // 알림 뱃지 제거
+                document.getElementById('notificationBtn').innerHTML = '🔔';
                 return;
             }
 
-            notificationsList.innerHTML = friendRequests.map(req => `
-                <div style="background: rgba(124, 58, 237, 0.1); border: 1px solid #7c3aed; border-radius: 12px; padding: 20px; margin-bottom: 15px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <div style="font-weight: 600; margin-bottom: 5px;">Friend Request</div>
-                            <div style="color: #8b949e; font-size: 14px;">
-                                <span style="color: #7c3aed; font-weight: 600;">${req.requester.username}</span> sent you a friend request
+            notificationsList.innerHTML = myRequests.map(req => {
+                const requester = req.user1; // user1이 항상 요청자
+                return `
+                    <div style="background: rgba(124, 58, 237, 0.1); border: 1px solid #7c3aed; border-radius: 12px; padding: 20px; margin-bottom: 15px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; gap: 15px;">
+                            <div>
+                                <div style="font-weight: 600; margin-bottom: 5px;">Friend Request</div>
+                                <div style="color: #8b949e; font-size: 14px;">
+                                    <span style="color: #7c3aed; font-weight: 600;">${requester?.username || 'Unknown'}</span> sent you a friend request
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 10px;">
+                                <button class="btn btn-primary" onclick="acceptFriendRequest('${req.id}')">Accept</button>
+                                <button class="btn btn-secondary" onclick="rejectFriendRequest('${req.id}')">Reject</button>
                             </div>
                         </div>
-                        <div style="display: flex; gap: 10px;">
-                            <button class="btn btn-primary" onclick="acceptFriendRequest('${req.id}')">Accept</button>
-                            <button class="btn btn-secondary" onclick="rejectFriendRequest('${req.id}')">Reject</button>
-                        </div>
                     </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
 
             // 알림 뱃지 표시
-            if (friendRequests.length > 0) {
-                document.getElementById('notificationBtn').innerHTML = '🔔<span style="position: absolute; top: 5px; right: 5px; width: 8px; height: 8px; background: #ef4444; border-radius: 50%;"></span>';
-            }
+            const notifBtn = document.getElementById('notificationBtn');
+            notifBtn.style.position = 'relative';
+            notifBtn.innerHTML = '🔔<span style="position: absolute; top: 5px; right: 5px; width: 8px; height: 8px; background: #ef4444; border-radius: 50%;"></span>';
         }
 
         async function acceptFriendRequest(requestId) {
@@ -1944,8 +1962,22 @@
         async function sendFriendRequestToUser() {
             if (!currentViewingUser) return;
 
-            const user1 = Math.min(currentUser.id, currentViewingUser);
-            const user2 = Math.max(currentUser.id, currentViewingUser);
+            // user1_id < user2_id 조건 때문에 작은 값을 user1에
+            const user1 = currentUser.id < currentViewingUser ? currentUser.id : currentViewingUser;
+            const user2 = currentUser.id < currentViewingUser ? currentViewingUser : currentUser.id;
+
+            // 이미 있는지 확인
+            const { data: existing } = await sb
+                .from('friendships')
+                .select('*')
+                .eq('user1_id', user1)
+                .eq('user2_id', user2)
+                .single();
+
+            if (existing) {
+                showNotification('Already sent or already friends!');
+                return;
+            }
 
             const { error } = await sb.from('friendships').insert([{
                 user1_id: user1,
@@ -1954,7 +1986,8 @@
             }]);
 
             if (error) {
-                showNotification('Already sent or already friends!');
+                console.error('Friend request error:', error);
+                showNotification('Failed to send friend request');
             } else {
                 document.getElementById('friendBtn').textContent = 'Pending';
                 document.getElementById('friendBtn').disabled = true;
