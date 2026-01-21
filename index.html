@@ -2170,7 +2170,11 @@
         }
 
         async function sendMessage() {
-            if (!currentUser || !currentRecipient) return;
+            if (!currentUser || !currentRecipient) {
+                console.error('Missing user or recipient:', { currentUser, currentRecipient });
+                showNotification('Please select a conversation first!');
+                return;
+            }
 
             const input = document.getElementById('messageInput');
             const content = input.value.trim();
@@ -2180,20 +2184,30 @@
                 return;
             }
 
-            const { error } = await sb.from('messages').insert([{
+            console.log('Sending message:', {
+                sender_id: currentUser.id,
+                recipient_id: currentRecipient.id,
+                content: content
+            });
+
+            const { data, error } = await sb.from('messages').insert([{
                 sender_id: currentUser.id,
                 recipient_id: currentRecipient.id,
                 content: content,
                 read: false
-            }]);
+            }]).select();
+
+            console.log('Message result:', { data, error });
 
             if (error) {
-                showNotification('Failed to send message');
-                console.error(error);
+                showNotification('Failed to send message: ' + error.message);
+                console.error('Full error:', error);
             } else {
+                console.log('Message sent successfully!');
                 input.value = '';
                 await loadMessages(currentRecipient.id);
                 await loadConversations();
+                showNotification('Message sent! 💬');
             }
         }
 
