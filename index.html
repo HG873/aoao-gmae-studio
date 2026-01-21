@@ -1036,6 +1036,35 @@
             await checkAuth();
             await loadGames();
             setupEventListeners();
+            
+            // 로그인한 경우 알림 주기적으로 확인 (30초마다)
+            if (currentUser) {
+                setInterval(async () => {
+                    if (currentUser) {
+                        await checkNewNotifications();
+                    }
+                }, 30000);
+            }
+        }
+
+        async function checkNewNotifications() {
+            if (!currentUser) return;
+
+            const { data: friendRequests } = await sb
+                .from('friendships')
+                .select('id')
+                .or(`user1_id.eq.${currentUser.id},user2_id.eq.${currentUser.id}`)
+                .eq('status', 'pending');
+
+            const myRequests = friendRequests?.filter(req => req.user2_id === currentUser.id) || [];
+            
+            const notifBtn = document.getElementById('notificationBtn');
+            if (myRequests.length > 0) {
+                notifBtn.style.position = 'relative';
+                notifBtn.innerHTML = '🔔<span style="position: absolute; top: 5px; right: 5px; width: 8px; height: 8px; background: #ef4444; border-radius: 50%;"></span>';
+            } else {
+                notifBtn.innerHTML = '🔔';
+            }
         }
 
         function setupEventListeners() {
@@ -1233,6 +1262,9 @@
                 return;
             }
 
+            // SVG placeholder 이미지 생성
+            const placeholderSVG = `data:image/svg+xml,%3Csvg width='320' height='180' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='320' height='180' fill='%237c3aed'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='24' fill='white'%3EGame%3C/text%3E%3C/svg%3E`;
+
             container.innerHTML = games.map(game => {
                 const isNew = (() => {
                     const date = new Date(game.created_at);
@@ -1244,10 +1276,10 @@
                 return `
                     <div class="game-card" onclick="playGame('${game.id}')">
                         <div class="game-thumb-wrapper">
-                            <img src="${game.thumbnail_url || 'https://via.placeholder.com/320x180/7c3aed/ffffff?text=Game'}" 
+                            <img src="${game.thumbnail_url || placeholderSVG}" 
                                  alt="${game.title}" 
                                  class="game-thumb"
-                                 onerror="this.src='https://via.placeholder.com/320x180/7c3aed/ffffff?text=Game'">
+                                 onerror="this.src='${placeholderSVG}'">
                             ${isHot ? '<div class="game-badge">TOP RATED</div>' : ''}
                             ${isNew && !isHot ? '<div class="game-badge new">NEW</div>' : ''}
                         </div>
@@ -1755,24 +1787,22 @@
         async function loadNotifications() {
             if (!currentUser) return;
 
-            // 친구 요청 가져오기 - 내가 user2이거나 user1인 경우 모두 확인
-            const { data: friendRequests, error } = await sb
+            console.log('Loading notifications for user:', currentUser.id);
+
+            // 친구 요청 가져오기 - 모든 pending 요청 먼저 확인
+            const { data: allRequests, error: allError } = await sb
                 .from('friendships')
                 .select('*, user1:profiles!friendships_user1_id_fkey(username), user2:profiles!friendships_user2_id_fkey(username)')
-                .or(`user1_id.eq.${currentUser.id},user2_id.eq.${currentUser.id}`)
                 .eq('status', 'pending');
 
-            console.log('Friend requests:', friendRequests, 'Error:', error);
+            console.log('All pending requests:', allRequests, 'Error:', allError);
+
+            // 내가 user2인 요청만 필터링 (내가 받은 요청)
+            const myRequests = allRequests?.filter(req => req.user2_id === currentUser.id) || [];
+
+            console.log('My requests (user2):', myRequests);
 
             const notificationsList = document.getElementById('notificationsList');
-
-            // 나에게 온 요청만 필터링
-            const myRequests = friendRequests?.filter(req => {
-                // 내가 user2이면서 user1이 요청자인 경우
-                if (req.user2_id === currentUser.id) return true;
-                // 내가 user1이면서 user2가 요청자인 경우 (잘못된 케이스지만 방어)
-                return false;
-            }) || [];
 
             if (myRequests.length === 0) {
                 notificationsList.innerHTML = '<p style="text-align: center; color: #8b949e; padding: 40px;">No notifications</p>';
@@ -1783,17 +1813,21 @@
             }
 
             notificationsList.innerHTML = myRequests.map(req => {
-                const requester = req.user1; // user1이 항상 요청자
+                const requester = req.user1; // user1이 항상 요청자 (작은 UUID)
+                console.log('Rendering notification:', req);
                 return `
                     <div style="background: rgba(124, 58, 237, 0.1); border: 1px solid #7c3aed; border-radius: 12px; padding: 20px; margin-bottom: 15px;">
                         <div style="display: flex; justify-content: space-between; align-items: center; gap: 15px;">
                             <div>
                                 <div style="font-weight: 600; margin-bottom: 5px;">Friend Request</div>
                                 <div style="color: #8b949e; font-size: 14px;">
-                                    <span style="color: #7c3aed; font-weight: 600;">${requester?.username || 'Unknown'}</span> sent you a friend request
+                                    <span style="color: #7c3aed; font-weight: 600;">${requester?.username || 'Unknown User'}</span> sent you a friend request
+                                </div>
+                                <div style="color: #6b7280; font-size: 11px; margin-top: 4px;">
+                                    Request ID: ${req.id.substring(0, 8)}...
                                 </div>
                             </div>
-                            <div style="display: flex; gap: 10px;">
+                            <div style="display: flex; gap: 10px; flex-shrink: 0;">
                                 <button class="btn btn-primary" onclick="acceptFriendRequest('${req.id}')">Accept</button>
                                 <button class="btn btn-secondary" onclick="rejectFriendRequest('${req.id}')">Reject</button>
                             </div>
@@ -1954,9 +1988,12 @@
                 showNotification('Following! 👥');
             }
 
-            // 카운트 업데이트
+            // 팔로워/팔로잉 수 다시 로드
             const { data: followers } = await sb.from('follows').select('follower_id').eq('following_id', currentViewingUser);
+            const { data: following } = await sb.from('follows').select('following_id').eq('follower_id', currentViewingUser);
+            
             document.getElementById('otherFollowerCount').textContent = followers?.length || 0;
+            document.getElementById('otherFollowingCount').textContent = following?.length || 0;
         }
 
         async function sendFriendRequestToUser() {
@@ -1965,6 +2002,8 @@
             // user1_id < user2_id 조건 때문에 작은 값을 user1에
             const user1 = currentUser.id < currentViewingUser ? currentUser.id : currentViewingUser;
             const user2 = currentUser.id < currentViewingUser ? currentViewingUser : currentUser.id;
+
+            console.log('Sending friend request:', { user1, user2, currentUser: currentUser.id, viewing: currentViewingUser });
 
             // 이미 있는지 확인
             const { data: existing } = await sb
@@ -1975,15 +2014,18 @@
                 .single();
 
             if (existing) {
+                console.log('Already exists:', existing);
                 showNotification('Already sent or already friends!');
                 return;
             }
 
-            const { error } = await sb.from('friendships').insert([{
+            const { data: newRequest, error } = await sb.from('friendships').insert([{
                 user1_id: user1,
                 user2_id: user2,
                 status: 'pending'
-            }]);
+            }]).select();
+
+            console.log('Friend request result:', { data: newRequest, error });
 
             if (error) {
                 console.error('Friend request error:', error);
@@ -1992,6 +2034,14 @@
                 document.getElementById('friendBtn').textContent = 'Pending';
                 document.getElementById('friendBtn').disabled = true;
                 showNotification('Friend request sent! 🤝');
+                
+                // 디버깅: 요청이 제대로 저장되었는지 확인
+                const { data: verify } = await sb
+                    .from('friendships')
+                    .select('*')
+                    .eq('user1_id', user1)
+                    .eq('user2_id', user2);
+                console.log('Verification:', verify);
             }
         }
 
