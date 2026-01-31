@@ -782,6 +782,13 @@
                     </select>
                 </div>
                 <div class="form-group">
+                    <label class="form-label">Server URL (Optional - For Multiplayer)</label>
+                    <input type="text" class="form-input" id="gameServerUrl" placeholder="ws://your-server.com:8765">
+                    <p style="font-size: 12px; color: #8b949e; margin-top: 5px;">
+                        WebSocket server URL for real-time multiplayer games
+                    </p>
+                </div>
+                <div class="form-group">
                     <label class="form-label">HTML Code</label>
                     <textarea class="form-textarea" id="gameHtml" placeholder="<div>Game HTML</div>"></textarea>
                 </div>
@@ -1335,6 +1342,7 @@
                 thumbnail_url: document.getElementById('gameThumbnail').value,
                 controls: document.getElementById('gameControls').value,
                 category: document.getElementById('gameCategory').value,
+                server_url: document.getElementById('gameServerUrl').value || null,
                 html_code: document.getElementById('gameHtml').value,
                 css_code: document.getElementById('gameCss').value,
                 js_code: document.getElementById('gameJs').value,
@@ -1355,6 +1363,7 @@
 
             if (error) {
                 showNotification('Save failed: ' + error.message);
+                console.error('Save error:', error);
             } else {
                 showNotification(editingGameId ? 'Game updated! ✨' : 'Game created! 🎉');
                 closeModal('gameModal');
@@ -1407,6 +1416,7 @@
             document.getElementById('gameThumbnail').value = currentGame.thumbnail_url || '';
             document.getElementById('gameControls').value = currentGame.controls || '';
             document.getElementById('gameCategory').value = currentGame.category || 'action';
+            document.getElementById('gameServerUrl').value = currentGame.server_url || '';
             document.getElementById('gameHtml').value = currentGame.html_code || '';
             document.getElementById('gameCss').value = currentGame.css_code || '';
             document.getElementById('gameJs').value = currentGame.js_code || '';
@@ -1552,21 +1562,35 @@
             if (!currentUser) return;
 
             // 팔로워 수
-            const { data: followers, error: followersError } = await sb
+            const { data: followers } = await sb
                 .from('follows')
                 .select('follower_id')
                 .eq('following_id', currentUser.id);
 
             // 팔로잉 수
-            const { data: following, error: followingError } = await sb
+            const { data: following } = await sb
                 .from('follows')
                 .select('following_id')
                 .eq('follower_id', currentUser.id);
 
-            // UI 업데이트
-            const stats = document.querySelector('.profile-card').querySelectorAll('.text-center');
-            if (stats[0]) stats[0].querySelector('div:first-child').textContent = followers?.length || 0;
-            if (stats[1]) stats[1].querySelector('div:first-child').textContent = following?.length || 0;
+            // UI 업데이트 - 프로필 카드의 통계
+            const profileCard = document.querySelector('.profile-card');
+            if (profileCard) {
+                const stats = profileCard.querySelectorAll('[style*="text-align: center"]');
+                if (stats[0]) {
+                    const followerCount = stats[0].querySelector('div:first-child');
+                    if (followerCount) followerCount.textContent = followers?.length || 0;
+                }
+                if (stats[1]) {
+                    const followingCount = stats[1].querySelector('div:first-child');
+                    if (followingCount) followingCount.textContent = following?.length || 0;
+                }
+            }
+
+            console.log('Follow stats updated:', {
+                followers: followers?.length || 0,
+                following: following?.length || 0
+            });
         }
 
         async function showFollowers() {
