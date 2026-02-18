@@ -15,15 +15,15 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
-            background: #0d1117;
-            color: #c9d1d9;
+            background: #f8f9fa;
+            color: #212529;
             min-height: 100vh;
         }
 
         /* 커스텀 스크롤바 */
         * {
             scrollbar-width: thin;
-            scrollbar-color: #30363d transparent;
+            scrollbar-color: #dee2e6 transparent;
         }
 
         *::-webkit-scrollbar {
@@ -37,14 +37,14 @@
         }
 
         *::-webkit-scrollbar-thumb {
-            background: #30363d;
+            background: #dee2e6;
             border-radius: 5px;
             border: 2px solid transparent;
             background-clip: padding-box;
         }
 
         *::-webkit-scrollbar-thumb:hover {
-            background: #484f58;
+            background: #ced4da;
             border: 2px solid transparent;
             background-clip: padding-box;
         }
@@ -56,18 +56,19 @@
             left: 0;
             right: 0;
             height: 64px;
-            background: #161b22;
-            border-bottom: 1px solid #30363d;
+            background: #ffffff;
+            border-bottom: 1px solid #e9ecef;
             display: flex;
             align-items: center;
             padding: 0 32px;
             z-index: 1000;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
 
         .logo {
             font-size: 20px;
-            font-weight: 600;
-            color: #f0f6fc;
+            font-weight: 700;
+            color: #212529;
             margin-right: 16px;
             cursor: pointer;
         }
@@ -81,24 +82,25 @@
 
         .search-input {
             width: 100%;
-            height: 32px;
-            background: #0d1117;
-            border: 1px solid #30363d;
-            border-radius: 6px;
+            height: 36px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
             padding: 0 12px;
-            color: #c9d1d9;
+            color: #212529;
             font-size: 14px;
             transition: all 0.2s;
         }
 
         .search-input:focus {
             outline: none;
-            border-color: #58a6ff;
-            background: #161b22;
+            border-color: #0d6efd;
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1);
         }
 
         .search-input::placeholder {
-            color: #8b949e;
+            color: #6c757d;
         }
 
         .header-actions {
@@ -109,30 +111,31 @@
         }
 
         .icon-btn {
-            width: 32px;
-            height: 32px;
+            width: 36px;
+            height: 36px;
             background: none;
             border: none;
-            color: #c9d1d9;
+            color: #495057;
             font-size: 18px;
             cursor: pointer;
-            border-radius: 6px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background 0.2s;
+            transition: all 0.2s;
             position: relative;
         }
 
         .icon-btn:hover {
-            background: #30363d;
+            background: #f8f9fa;
+            color: #212529;
         }
 
         .btn-login {
-            padding: 5px 16px;
-            background: #238636;
-            border: 1px solid rgba(240, 246, 252, 0.1);
-            border-radius: 6px;
+            padding: 8px 16px;
+            background: #0d6efd;
+            border: none;
+            border-radius: 8px;
             color: #ffffff;
             font-size: 14px;
             font-weight: 600;
@@ -141,7 +144,7 @@
         }
 
         .btn-login:hover {
-            background: #2ea043;
+            background: #0b5ed7;
         }
 
         /* 사이드바 */
@@ -151,8 +154,8 @@
             top: 64px;
             width: 280px;
             height: calc(100vh - 64px);
-            background: #0d1117;
-            border-right: 1px solid #30363d;
+            background: #ffffff;
+            border-right: 1px solid #e9ecef;
             padding: 24px 16px;
             z-index: 900;
             overflow-y: auto;
@@ -163,35 +166,37 @@
         }
 
         .sidebar-title {
-            font-size: 12px;
-            font-weight: 600;
-            color: #8b949e;
+            font-size: 11px;
+            font-weight: 700;
+            color: #6c757d;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             margin-bottom: 8px;
-            padding: 0 8px;
+            padding: 0 12px;
         }
 
         .sidebar-item {
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 8px;
-            border-radius: 6px;
+            padding: 10px 12px;
+            border-radius: 8px;
             cursor: pointer;
-            color: #c9d1d9;
+            color: #495057;
             font-size: 14px;
+            font-weight: 500;
             transition: all 0.2s;
             margin-bottom: 2px;
         }
 
         .sidebar-item:hover {
-            background: #161b22;
+            background: #f8f9fa;
+            color: #212529;
         }
 
         .sidebar-item.active {
-            background: #1f6feb;
-            color: #ffffff;
+            background: #e7f1ff;
+            color: #0d6efd;
             font-weight: 600;
         }
 
@@ -207,24 +212,25 @@
             margin-top: 64px;
             padding: 40px;
             min-height: calc(100vh - 64px);
+            background: #f8f9fa;
         }
 
         .page-header {
             margin-bottom: 32px;
             padding-bottom: 24px;
-            border-bottom: 1px solid #21262d;
+            border-bottom: 1px solid #e9ecef;
         }
 
         .page-title {
             font-size: 32px;
-            font-weight: 600;
+            font-weight: 700;
             margin-bottom: 8px;
-            color: #f0f6fc;
+            color: #212529;
         }
 
         .page-description {
             font-size: 16px;
-            color: #8b949e;
+            color: #6c757d;
             line-height: 1.5;
         }
 
@@ -237,8 +243,8 @@
 
         .section-title {
             font-size: 20px;
-            font-weight: 600;
-            color: #f0f6fc;
+            font-weight: 700;
+            color: #212529;
         }
 
         .filter-group {
@@ -247,11 +253,11 @@
         }
 
         .filter-btn {
-            padding: 5px 16px;
-            background: #21262d;
-            border: 1px solid #30363d;
-            border-radius: 6px;
-            color: #c9d1d9;
+            padding: 6px 16px;
+            background: #ffffff;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            color: #495057;
             font-size: 14px;
             font-weight: 500;
             cursor: pointer;
@@ -259,13 +265,13 @@
         }
 
         .filter-btn:hover {
-            background: #30363d;
-            border-color: #8b949e;
+            background: #f8f9fa;
+            border-color: #adb5bd;
         }
 
         .filter-btn.active {
-            background: #1f6feb;
-            border-color: #1f6feb;
+            background: #0d6efd;
+            border-color: #0d6efd;
             color: #ffffff;
         }
 
@@ -278,24 +284,26 @@
         }
 
         .game-card {
-            background: #161b22;
-            border: 1px solid #30363d;
-            border-radius: 6px;
+            background: #ffffff;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
             overflow: hidden;
             cursor: pointer;
             transition: all 0.2s;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
 
         .game-card:hover {
-            border-color: #58a6ff;
-            box-shadow: 0 0 0 1px #58a6ff;
+            border-color: #0d6efd;
+            box-shadow: 0 4px 12px rgba(13, 110, 253, 0.15);
+            transform: translateY(-2px);
         }
 
         .game-thumb-wrapper {
             position: relative;
             width: 100%;
             padding-bottom: 56.25%;
-            background: linear-gradient(135deg, #0d1117, #21262d);
+            background: linear-gradient(135deg, #e9ecef, #f8f9fa);
             overflow: hidden;
         }
 
@@ -314,7 +322,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(255, 255, 255, 0.95);
             opacity: 0;
             transition: opacity 0.2s;
             display: flex;
@@ -327,10 +335,10 @@
         }
 
         .play-btn {
-            width: 48px;
-            height: 48px;
+            width: 56px;
+            height: 56px;
             border-radius: 50%;
-            background: #238636;
+            background: #0d6efd;
             border: none;
             color: white;
             font-size: 20px;
@@ -338,23 +346,25 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
+            box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
         }
 
         .game-badge {
             position: absolute;
-            top: 8px;
-            right: 8px;
-            padding: 4px 8px;
-            background: #da3633;
-            border-radius: 6px;
+            top: 12px;
+            right: 12px;
+            padding: 6px 12px;
+            background: #dc3545;
+            border-radius: 8px;
             font-size: 11px;
-            font-weight: 600;
+            font-weight: 700;
             color: white;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .game-badge.new {
-            background: #1f6feb;
+            background: #0d6efd;
         }
 
         .game-info {
@@ -363,9 +373,9 @@
 
         .game-title {
             font-size: 16px;
-            font-weight: 600;
+            font-weight: 700;
             margin-bottom: 8px;
-            color: #58a6ff;
+            color: #212529;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -373,7 +383,7 @@
 
         .game-description {
             font-size: 14px;
-            color: #8b949e;
+            color: #6c757d;
             margin-bottom: 12px;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -386,8 +396,8 @@
         .game-meta {
             display: flex;
             gap: 16px;
-            font-size: 12px;
-            color: #8b949e;
+            font-size: 13px;
+            color: #6c757d;
         }
 
         .game-meta-item {
@@ -404,7 +414,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(1, 4, 9, 0.8);
+            background: rgba(0, 0, 0, 0.5);
             z-index: 2000;
             overflow-y: auto;
             padding: 20px;
@@ -417,18 +427,19 @@
         }
 
         .modal-content {
-            background: #0d1117;
-            border: 1px solid #30363d;
-            border-radius: 6px;
+            background: #ffffff;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
             max-width: 800px;
             width: 100%;
             max-height: 90vh;
             overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
         }
 
         .modal-header {
-            padding: 16px;
-            border-bottom: 1px solid #21262d;
+            padding: 20px;
+            border-bottom: 1px solid #e9ecef;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -436,17 +447,17 @@
 
         .modal-title {
             font-size: 20px;
-            font-weight: 600;
-            color: #f0f6fc;
+            font-weight: 700;
+            color: #212529;
         }
 
         .close-btn {
-            width: 32px;
-            height: 32px;
-            border-radius: 6px;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
             background: transparent;
             border: none;
-            color: #8b949e;
+            color: #6c757d;
             font-size: 20px;
             cursor: pointer;
             display: flex;
@@ -456,12 +467,12 @@
         }
 
         .close-btn:hover {
-            background: #30363d;
-            color: #c9d1d9;
+            background: #f8f9fa;
+            color: #212529;
         }
 
         .modal-body {
-            padding: 16px;
+            padding: 20px;
         }
 
         .form-group {
@@ -473,28 +484,30 @@
             font-size: 14px;
             font-weight: 600;
             margin-bottom: 8px;
-            color: #f0f6fc;
+            color: #212529;
         }
 
         .form-input,
         .form-textarea,
         .form-select {
             width: 100%;
-            padding: 5px 12px;
-            background: #0d1117;
-            border: 1px solid #30363d;
-            border-radius: 6px;
-            color: #c9d1d9;
+            padding: 10px 12px;
+            background: #ffffff;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            color: #212529;
             font-size: 14px;
             font-family: inherit;
-            line-height: 20px;
+            line-height: 1.5;
+            transition: all 0.2s;
         }
 
         .form-input:focus,
         .form-textarea:focus,
         .form-select:focus {
             outline: none;
-            border-color: #58a6ff;
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1);
         }
 
         .form-textarea {
@@ -504,9 +517,9 @@
         }
 
         .btn {
-            padding: 5px 16px;
-            border: 1px solid rgba(240, 246, 252, 0.1);
-            border-radius: 6px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
@@ -514,38 +527,38 @@
         }
 
         .btn-primary {
-            background: #238636;
+            background: #0d6efd;
             color: #ffffff;
         }
 
         .btn-primary:hover {
-            background: #2ea043;
+            background: #0b5ed7;
         }
 
         .btn-secondary {
-            background: #21262d;
-            color: #c9d1d9;
+            background: #6c757d;
+            color: #ffffff;
         }
 
         .btn-secondary:hover {
-            background: #30363d;
+            background: #5c636a;
         }
 
         .btn-danger {
-            background: #da3633;
+            background: #dc3545;
             color: #ffffff;
         }
 
         .btn-danger:hover {
-            background: #e5534b;
+            background: #bb2d3b;
         }
 
         .game-iframe {
             width: 100%;
             height: 500px;
-            border: 1px solid #30363d;
-            border-radius: 6px;
-            background: #0d1117;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            background: #f8f9fa;
             margin-bottom: 16px;
         }
 
@@ -559,28 +572,28 @@
         .empty-state {
             text-align: center;
             padding: 80px 20px;
-            color: #8b949e;
+            color: #6c757d;
         }
 
         .empty-state-icon {
             font-size: 64px;
             margin-bottom: 16px;
-            opacity: 0.4;
+            opacity: 0.5;
         }
 
         .notification {
             position: fixed;
             bottom: 24px;
             right: 24px;
-            background: #161b22;
-            border: 1px solid #30363d;
-            border-left: 3px solid #238636;
-            border-radius: 6px;
-            padding: 12px 16px;
+            background: #ffffff;
+            border: 1px solid #e9ecef;
+            border-left: 4px solid #198754;
+            border-radius: 8px;
+            padding: 16px 20px;
             font-size: 14px;
-            color: #c9d1d9;
+            color: #212529;
             z-index: 3000;
-            box-shadow: 0 8px 24px rgba(1, 4, 9, 0.4);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
 
         .create-btn {
@@ -589,30 +602,31 @@
             right: 32px;
             width: 56px;
             height: 56px;
-            background: #238636;
-            border: 1px solid rgba(240, 246, 252, 0.1);
+            background: #0d6efd;
+            border: none;
             border-radius: 50%;
             color: white;
             font-size: 24px;
             cursor: pointer;
-            box-shadow: 0 8px 24px rgba(35, 134, 54, 0.4);
+            box-shadow: 0 4px 12px rgba(13, 110, 253, 0.4);
             z-index: 100;
             display: none;
             transition: all 0.2s;
         }
 
         .create-btn:hover {
-            background: #2ea043;
+            background: #0b5ed7;
             transform: scale(1.05);
         }
 
         /* 프로필 카드 */
         .profile-card {
-            background: #161b22;
-            border: 1px solid #30363d;
-            border-radius: 6px;
+            background: #ffffff;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
             padding: 32px;
             margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
 
         .profile-header {
@@ -625,7 +639,7 @@
             width: 96px;
             height: 96px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #1f6feb, #8957e5);
+            background: linear-gradient(135deg, #0d6efd, #6610f2);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -639,14 +653,14 @@
 
         .profile-name {
             font-size: 26px;
-            font-weight: 600;
-            color: #f0f6fc;
+            font-weight: 700;
+            color: #212529;
             margin-bottom: 4px;
         }
 
         .profile-bio {
             font-size: 16px;
-            color: #8b949e;
+            color: #6c757d;
             margin-bottom: 16px;
         }
 
@@ -654,21 +668,21 @@
             display: flex;
             gap: 24px;
             padding: 16px 0;
-            border-top: 1px solid #21262d;
-            border-bottom: 1px solid #21262d;
+            border-top: 1px solid #e9ecef;
+            border-bottom: 1px solid #e9ecef;
         }
 
         .stat-item {
             display: flex;
             align-items: center;
             gap: 8px;
-            color: #8b949e;
+            color: #6c757d;
             font-size: 14px;
         }
 
         .stat-value {
-            font-weight: 600;
-            color: #f0f6fc;
+            font-weight: 700;
+            color: #212529;
         }
 
         .profile-actions {
@@ -679,9 +693,9 @@
 
         /* 댓글 */
         .comment-item {
-            background: #161b22;
-            border: 1px solid #30363d;
-            border-radius: 6px;
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
             padding: 16px;
             margin-bottom: 8px;
         }
@@ -694,19 +708,19 @@
         }
 
         .comment-author {
-            font-weight: 600;
-            color: #58a6ff;
+            font-weight: 700;
+            color: #0d6efd;
             font-size: 14px;
         }
 
         .comment-time {
             font-size: 12px;
-            color: #8b949e;
+            color: #6c757d;
         }
 
         .comment-body {
             font-size: 14px;
-            color: #c9d1d9;
+            color: #212529;
             line-height: 1.5;
         }
 
@@ -715,13 +729,13 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 16px;
-            border-bottom: 1px solid #21262d;
+            padding: 16px 20px;
+            border-bottom: 1px solid #e9ecef;
             transition: background 0.2s;
         }
 
         .user-list-item:hover {
-            background: #161b22;
+            background: #f8f9fa;
         }
 
         .user-info {
@@ -731,26 +745,26 @@
         }
 
         .user-avatar {
-            width: 40px;
-            height: 40px;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #1f6feb, #8957e5);
+            background: linear-gradient(135deg, #0d6efd, #6610f2);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
+            font-size: 18px;
         }
 
         .user-name {
             font-size: 14px;
-            font-weight: 600;
-            color: #58a6ff;
+            font-weight: 700;
+            color: #212529;
             margin-bottom: 2px;
         }
 
         .user-bio {
-            font-size: 12px;
-            color: #8b949e;
+            font-size: 13px;
+            color: #6c757d;
         }
 
         /* 메시지 */
@@ -766,26 +780,26 @@
 
         .message-bubble {
             max-width: 70%;
-            padding: 8px 12px;
-            border-radius: 6px;
+            padding: 10px 14px;
+            border-radius: 12px;
             font-size: 14px;
             line-height: 1.5;
         }
 
         .message-item.mine .message-bubble {
-            background: #1f6feb;
+            background: #0d6efd;
             color: white;
         }
 
         .message-item:not(.mine) .message-bubble {
-            background: #161b22;
-            border: 1px solid #30363d;
-            color: #c9d1d9;
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            color: #212529;
         }
 
         .message-time {
             font-size: 11px;
-            color: #8b949e;
+            color: #6c757d;
             margin-top: 4px;
         }
 
@@ -983,7 +997,7 @@
     <!-- 플로팅 버튼 -->
     <button class="create-btn" id="createBtn" onclick="openCreateGameModal()" title="게임 만들기">+</button>
 
-    <!-- 로그인 모달 -->
+    <!-- 모달들 (로그인, 회원가입 등) -->
     <div id="loginModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -1005,7 +1019,6 @@
         </div>
     </div>
 
-    <!-- 회원가입 모달 -->
     <div id="signupModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -1030,7 +1043,6 @@
         </div>
     </div>
 
-    <!-- 게임 생성 모달 -->
     <div id="gameModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -1089,7 +1101,6 @@
         </div>
     </div>
 
-    <!-- 플레이 모달 -->
     <div id="playModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -1097,8 +1108,8 @@
                 <button class="close-btn" onclick="closeModal('playModal')">✕</button>
             </div>
             <div class="modal-body">
-                <p id="playGameDescription" style="color: #8b949e; margin-bottom: 8px; font-size: 14px;"></p>
-                <p id="playGameControls" style="color: #58a6ff; font-weight: 600; margin-bottom: 16px; font-size: 13px;"></p>
+                <p id="playGameDescription" style="color: #6c757d; margin-bottom: 8px; font-size: 14px;"></p>
+                <p id="playGameControls" style="color: #0d6efd; font-weight: 600; margin-bottom: 16px; font-size: 13px;"></p>
                 
                 <iframe id="gameFrame" class="game-iframe"></iframe>
                 
@@ -1110,8 +1121,8 @@
                     <button class="btn btn-secondary" onclick="shareGame()">🔗 공유</button>
                 </div>
 
-                <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #21262d;">
-                    <h3 style="margin-bottom: 12px; font-size: 16px; font-weight: 600; color: #f0f6fc;">댓글</h3>
+                <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #e9ecef;">
+                    <h3 style="margin-bottom: 12px; font-size: 16px; font-weight: 700; color: #212529;">댓글</h3>
                     <div class="form-group">
                         <textarea class="form-textarea" id="commentInput" placeholder="댓글 달기..." style="min-height: 80px; font-family: inherit;"></textarea>
                         <button class="btn btn-primary" onclick="addComment()" style="margin-top: 8px;">댓글 작성</button>
@@ -1122,7 +1133,6 @@
         </div>
     </div>
 
-    <!-- 프로필 편집 모달 -->
     <div id="editProfileModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -1143,7 +1153,6 @@
         </div>
     </div>
 
-    <!-- 팔로워 모달 -->
     <div id="followersModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -1156,7 +1165,6 @@
         </div>
     </div>
 
-    <!-- 팔로잉 모달 -->
     <div id="followingModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -1169,7 +1177,6 @@
         </div>
     </div>
 
-    <!-- 알림 모달 -->
     <div id="notificationsModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -1182,7 +1189,6 @@
         </div>
     </div>
 
-    <!-- 유저 검색 모달 -->
     <div id="userSearchModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -1198,7 +1204,6 @@
         </div>
     </div>
 
-    <!-- 다른 유저 프로필 모달 -->
     <div id="otherUserProfileModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -1245,7 +1250,6 @@
         </div>
     </div>
 
-    <!-- DM 모달 -->
     <div id="dmModal" class="modal">
         <div class="modal-content" style="max-width: 900px; height: 600px; display: flex; flex-direction: column;">
             <div class="modal-header">
@@ -1253,22 +1257,22 @@
                 <button class="close-btn" onclick="closeModal('dmModal')">✕</button>
             </div>
             <div style="display: flex; flex: 1; overflow: hidden;">
-                <div style="width: 250px; border-right: 1px solid #21262d; overflow-y: auto;">
+                <div style="width: 250px; border-right: 1px solid #e9ecef; overflow-y: auto; background: #f8f9fa;">
                     <div id="conversationsList"></div>
                 </div>
                 
-                <div style="flex: 1; display: flex; flex-direction: column;">
-                    <div id="dmHeader" style="padding: 16px; border-bottom: 1px solid #21262d; display: none;">
-                        <h3 id="dmRecipientName" style="font-size: 16px; font-weight: 600; color: #f0f6fc;"></h3>
+                <div style="flex: 1; display: flex; flex-direction: column; background: #ffffff;">
+                    <div id="dmHeader" style="padding: 16px; border-bottom: 1px solid #e9ecef; display: none;">
+                        <h3 id="dmRecipientName" style="font-size: 16px; font-weight: 700; color: #212529;"></h3>
                     </div>
                     
-                    <div id="messagesArea" style="flex: 1; overflow-y: auto; padding: 16px;">
-                        <div style="text-align: center; color: #8b949e; padding: 80px 20px; font-size: 14px;">
+                    <div id="messagesArea" style="flex: 1; overflow-y: auto; padding: 16px; background: #f8f9fa;">
+                        <div style="text-align: center; color: #6c757d; padding: 80px 20px; font-size: 14px;">
                             대화를 선택해주세요
                         </div>
                     </div>
                     
-                    <div id="messageInputArea" style="padding: 16px; border-top: 1px solid #21262d; display: none;">
+                    <div id="messageInputArea" style="padding: 16px; border-top: 1px solid #e9ecef; background: #ffffff; display: none;">
                         <div style="display: flex; gap: 8px;">
                             <input type="text" class="form-input" id="messageInput" placeholder="메시지 입력..." style="flex: 1;">
                             <button class="btn btn-primary" onclick="sendMessage()">전송</button>
@@ -1280,9 +1284,36 @@
     </div>
 
     <script>
+        // 커스텀 스토리지 어댑터 생성 (메모리 기반)
+        class MemoryStorage {
+            constructor() {
+                this.store = {};
+            }
+            getItem(key) {
+                return this.store[key] || null;
+            }
+            setItem(key, value) {
+                this.store[key] = value;
+            }
+            removeItem(key) {
+                delete this.store[key];
+            }
+        }
+
+        const memoryStorage = new MemoryStorage();
+
+        // Supabase 클라이언트 생성 (메모리 스토리지 사용)
         const sb = window.supabase.createClient(
             'https://alnazztrdhpkyclkaklv.supabase.co',
-            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsbmF6enRyZGhwa3ljbGtha2x2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg3MzIwNDgsImV4cCI6MjA4NDMwODA0OH0.mUvc6zTV-xNhuBlC0iseVKX1WeNvkGgV_wO4Yl0dGxA'
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsbmF6enRyZGhwa3ljbGtha2x2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg3MzIwNDgsImV4cCI6MjA4NDMwODA0OH0.mUvc6zTV-xNhuBlC0iseVKX1WeNvkGgV_wO4Yl0dGxA',
+            {
+                auth: {
+                    storage: memoryStorage,
+                    autoRefreshToken: true,
+                    persistSession: false,
+                    detectSessionInUrl: false
+                }
+            }
         );
 
         let currentUser = null;
@@ -1337,7 +1368,7 @@
             const notifBtn = document.getElementById('notificationBtn');
             if (myRequests.length > 0) {
                 notifBtn.style.position = 'relative';
-                notifBtn.innerHTML = '🔔<span style="position: absolute; top: 2px; right: 2px; width: 8px; height: 8px; background: #1f6feb; border-radius: 50%;"></span>';
+                notifBtn.innerHTML = '🔔<span style="position: absolute; top: 2px; right: 2px; width: 8px; height: 8px; background: #0d6efd; border-radius: 50%;"></span>';
             } else {
                 notifBtn.innerHTML = '🔔';
             }
@@ -1546,7 +1577,7 @@
                 return;
             }
 
-            const placeholderSVG = `data:image/svg+xml,%3Csvg width='640' height='360' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='640' height='360' fill='%2321262d'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='64' fill='%238b949e'%3E🎮%3C/text%3E%3C/svg%3E`;
+            const placeholderSVG = `data:image/svg+xml,%3Csvg width='640' height='360' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='640' height='360' fill='%23e9ecef'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='64' fill='%236c757d'%3E🎮%3C/text%3E%3C/svg%3E`;
 
             container.innerHTML = games.map(game => {
                 const isNew = (() => {
@@ -1681,7 +1712,7 @@
 
                 const iframe = document.getElementById('gameFrame');
                 iframe.srcdoc = `<!DOCTYPE html><html><head><meta charset="UTF-8">
-                    <style>body{margin:0;padding:20px;background:#0d1117;color:#c9d1d9;}${game.css_code||''}</style></head>
+                    <style>body{margin:0;padding:20px;background:#f8f9fa;color:#212529;}${game.css_code||''}</style></head>
                     <body>${game.html_code||'<div style="text-align:center;padding:100px;"><h2>게임 코드가 없습니다</h2></div>'}
                     <script>${game.js_code||''}<\/script></body></html>`;
                 
@@ -1785,7 +1816,7 @@
             const commentsList = document.getElementById('commentsList');
             
             if (!comments || comments.length === 0) {
-                commentsList.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 20px; font-size: 14px;">첫 댓글을 작성해보세요</p>';
+                commentsList.innerHTML = '<p style="color: #6c757d; text-align: center; padding: 20px; font-size: 14px;">첫 댓글을 작성해보세요</p>';
                 return;
             }
 
@@ -1876,7 +1907,7 @@
             const list = document.getElementById('followersList');
             
             if (!follows || follows.length === 0) {
-                list.innerHTML = '<p style="text-align: center; color: #8b949e; padding: 40px; font-size: 14px;">팔로워가 없습니다</p>';
+                list.innerHTML = '<p style="text-align: center; color: #6c757d; padding: 40px; font-size: 14px;">팔로워가 없습니다</p>';
             } else {
                 list.innerHTML = follows.map(f => `
                     <div class="user-list-item">
@@ -1905,7 +1936,7 @@
             const list = document.getElementById('followingList');
             
             if (!follows || follows.length === 0) {
-                list.innerHTML = '<p style="text-align: center; color: #8b949e; padding: 40px; font-size: 14px;">팔로우한 사용자가 없습니다</p>';
+                list.innerHTML = '<p style="text-align: center; color: #6c757d; padding: 40px; font-size: 14px;">팔로우한 사용자가 없습니다</p>';
             } else {
                 list.innerHTML = follows.map(f => `
                     <div class="user-list-item">
@@ -1971,7 +2002,7 @@
             const notificationsList = document.getElementById('notificationsList');
 
             if (myRequests.length === 0) {
-                notificationsList.innerHTML = '<p style="text-align: center; color: #8b949e; padding: 40px; font-size: 14px;">알림이 없습니다</p>';
+                notificationsList.innerHTML = '<p style="text-align: center; color: #6c757d; padding: 40px; font-size: 14px;">알림이 없습니다</p>';
                 document.getElementById('notificationBtn').innerHTML = '🔔';
                 return;
             }
@@ -1979,7 +2010,7 @@
             notificationsList.innerHTML = myRequests.map(req => {
                 const requester = req.user1;
                 return `
-                    <div class="user-list-item" style="background: rgba(31, 111, 235, 0.1);">
+                    <div class="user-list-item" style="background: rgba(13, 110, 253, 0.05);">
                         <div class="user-info">
                             <div class="user-avatar">${requester?.username?.[0]?.toUpperCase() || '?'}</div>
                             <div>
@@ -1997,7 +2028,7 @@
 
             const notifBtn = document.getElementById('notificationBtn');
             notifBtn.style.position = 'relative';
-            notifBtn.innerHTML = '🔔<span style="position: absolute; top: 2px; right: 2px; width: 8px; height: 8px; background: #1f6feb; border-radius: 50%;"></span>';
+            notifBtn.innerHTML = '🔔<span style="position: absolute; top: 2px; right: 2px; width: 8px; height: 8px; background: #0d6efd; border-radius: 50%;"></span>';
         }
 
         async function acceptFriendRequest(requestId) {
@@ -2040,7 +2071,7 @@
                 const results = document.getElementById('userSearchResults');
 
                 if (!users || users.length === 0) {
-                    results.innerHTML = '<p style="text-align: center; color: #8b949e; padding: 20px; font-size: 14px;">사용자를 찾을 수 없습니다</p>';
+                    results.innerHTML = '<p style="text-align: center; color: #6c757d; padding: 20px; font-size: 14px;">사용자를 찾을 수 없습니다</p>';
                     return;
                 }
 
@@ -2191,7 +2222,7 @@
                 .order('created_at', { ascending: false });
 
             if (!messages || messages.length === 0) {
-                document.getElementById('conversationsList').innerHTML = '<p style="text-align: center; color: #8b949e; padding: 40px; font-size: 14px;">메시지가 없습니다</p>';
+                document.getElementById('conversationsList').innerHTML = '<p style="text-align: center; color: #6c757d; padding: 40px; font-size: 14px;">메시지가 없습니다</p>';
                 return;
             }
 
@@ -2213,7 +2244,7 @@
 
             const conversationsList = document.getElementById('conversationsList');
             conversationsList.innerHTML = Array.from(conversations.values()).map(conv => `
-                <div class="user-list-item" onclick="openConversation('${conv.userId}', '${conv.username}')" style="border: none; border-bottom: 1px solid #21262d;">
+                <div class="user-list-item" onclick="openConversation('${conv.userId}', '${conv.username}')" style="border: none; border-bottom: 1px solid #e9ecef;">
                     <div class="user-info">
                         <div class="user-avatar">${conv.username[0].toUpperCase()}</div>
                         <div style="flex: 1; min-width: 0;">
@@ -2221,7 +2252,7 @@
                             <div class="user-bio" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${conv.lastMessage}</div>
                         </div>
                     </div>
-                    ${conv.unread ? '<div style="width: 8px; height: 8px; border-radius: 50%; background: #1f6feb;"></div>' : ''}
+                    ${conv.unread ? '<div style="width: 8px; height: 8px; border-radius: 50%; background: #0d6efd;"></div>' : ''}
                 </div>
             `).join('');
         }
@@ -2252,7 +2283,7 @@
             const messagesArea = document.getElementById('messagesArea');
 
             if (!messages || messages.length === 0) {
-                messagesArea.innerHTML = '<p style="text-align: center; color: #8b949e; padding: 40px; font-size: 14px;">대화를 시작해보세요</p>';
+                messagesArea.innerHTML = '<p style="text-align: center; color: #6c757d; padding: 40px; font-size: 14px;">대화를 시작해보세요</p>';
                 return;
             }
 
