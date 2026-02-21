@@ -569,6 +569,68 @@
             margin-bottom: 16px;
         }
 
+        /* 전체화면 버튼 */
+        .fullscreen-btn {
+            padding: 10px 20px;
+            background: #198754;
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .fullscreen-btn:hover {
+            background: #157347;
+        }
+
+        /* 전체화면 모드 */
+        .fullscreen-mode {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #000;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .fullscreen-header {
+            height: 50px;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            color: white;
+        }
+
+        .fullscreen-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .exit-fullscreen-btn {
+            padding: 8px 16px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .fullscreen-iframe {
+            flex: 1;
+            border: none;
+            background: #000;
+        }
+
         .empty-state {
             text-align: center;
             padding: 80px 20px;
@@ -581,9 +643,10 @@
             opacity: 0.5;
         }
 
+        /* 알림 애니메이션 */
         .notification {
             position: fixed;
-            bottom: 24px;
+            bottom: -100px;
             right: 24px;
             background: #ffffff;
             border: 1px solid #e9ecef;
@@ -594,6 +657,29 @@
             color: #212529;
             z-index: 3000;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            animation: slideUp 0.3s ease-out forwards, slideDown 0.3s ease-out 2.7s forwards;
+        }
+
+        @keyframes slideUp {
+            from {
+                bottom: -100px;
+                opacity: 0;
+            }
+            to {
+                bottom: 24px;
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideDown {
+            from {
+                bottom: 24px;
+                opacity: 1;
+            }
+            to {
+                bottom: -100px;
+                opacity: 0;
+            }
         }
 
         .create-btn {
@@ -834,14 +920,11 @@
     </style>
 </head>
 <body>
-    <!-- 헤더 -->
     <header>
         <div class="logo">🎮 CrazyGames</div>
-
         <div class="search-container">
             <input type="text" class="search-input" id="searchInput" placeholder="게임 검색...">
         </div>
-
         <div class="header-actions">
             <button class="icon-btn" onclick="openDM()" title="메시지">💬</button>
             <button class="icon-btn" onclick="openNotifications()" title="알림" id="notificationBtn">🔔</button>
@@ -851,7 +934,6 @@
         </div>
     </header>
 
-    <!-- 사이드바 -->
     <aside class="sidebar">
         <div class="sidebar-section">
             <div class="sidebar-title">탐색</div>
@@ -914,9 +996,7 @@
         </div>
     </aside>
 
-    <!-- 메인 컨텐츠 -->
     <main class="main-content" id="mainContent">
-        <!-- 홈 -->
         <div id="homeView">
             <div class="page-header">
                 <div class="page-title">게임 탐색</div>
@@ -935,7 +1015,6 @@
             <div class="games-grid" id="allGames"></div>
         </div>
 
-        <!-- 섹션 뷰 -->
         <div id="sectionView" style="display: none;">
             <div class="page-header">
                 <div class="page-title" id="sectionTitle">액션 게임</div>
@@ -949,7 +1028,6 @@
             <div class="games-grid" id="sectionGames"></div>
         </div>
 
-        <!-- 프로필 -->
         <div id="profileView" style="display: none;">
             <div class="page-header">
                 <div class="page-title">프로필</div>
@@ -994,10 +1072,8 @@
         </div>
     </main>
 
-    <!-- 플로팅 버튼 -->
     <button class="create-btn" id="createBtn" onclick="openCreateGameModal()" title="게임 만들기">+</button>
 
-    <!-- 모달들 (로그인, 회원가입 등) -->
     <div id="loginModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -1114,6 +1190,7 @@
                 <iframe id="gameFrame" class="game-iframe"></iframe>
                 
                 <div class="game-actions">
+                    <button class="fullscreen-btn" onclick="enterFullscreen()">🖥️ 전체화면</button>
                     <button class="btn btn-primary" onclick="toggleHeart()">❤️ <span id="heartCount">0</span></button>
                     <button class="btn btn-secondary" onclick="toggleFavorite()">⭐ 저장</button>
                     <button class="btn btn-secondary" onclick="editCurrentGame()">✏️ 수정</button>
@@ -1284,7 +1361,6 @@
     </div>
 
     <script>
-        // 커스텀 스토리지 어댑터 생성 (메모리 기반)
         class MemoryStorage {
             constructor() {
                 this.store = {};
@@ -1302,7 +1378,6 @@
 
         const memoryStorage = new MemoryStorage();
 
-        // Supabase 클라이언트 생성 (메모리 스토리지 사용)
         const sb = window.supabase.createClient(
             'https://alnazztrdhpkyclkaklv.supabase.co',
             'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsbmF6enRyZGhwa3ljbGtha2x2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg3MzIwNDgsImV4cCI6MjA4NDMwODA0OH0.mUvc6zTV-xNhuBlC0iseVKX1WeNvkGgV_wO4Yl0dGxA',
@@ -1339,7 +1414,6 @@
         };
 
         async function init() {
-            console.log('초기화 시작...');
             await checkAuth();
             await loadGames();
             setupEventListeners();
@@ -1351,7 +1425,6 @@
                     }
                 }, 30000);
             }
-            console.log('초기화 완료!');
         }
 
         async function checkNewNotifications() {
@@ -1363,7 +1436,8 @@
                 .or(`user1_id.eq.${currentUser.id},user2_id.eq.${currentUser.id}`)
                 .eq('status', 'pending');
 
-            const myRequests = friendRequests?.filter(req => req.user2_id === currentUser.id) || [];
+            const myRequests = friendRequests?.filter(req => req.user2_id === currentUser.
+id) || [];
             
             const notifBtn = document.getElementById('notificationBtn');
             if (myRequests.length > 0) {
@@ -1470,7 +1544,6 @@
             if (data.session) {
                 currentUser = data.session.user;
                 updateHeader();
-                console.log('로그인됨:', currentUser.email);
             }
         }
 
@@ -1494,7 +1567,6 @@
 
             if (error) {
                 showNotification('로그인 실패: ' + error.message);
-                console.error('로그인 에러:', error);
             } else {
                 currentUser = data.user;
                 closeModal('loginModal');
@@ -1518,7 +1590,6 @@
 
             if (error) {
                 showNotification('회원가입 실패: ' + error.message);
-                console.error('회원가입 에러:', error);
             } else {
                 await sb.from('profiles').insert([{ id: data.user.id, username: username, bio: '' }]);
                 
@@ -1545,18 +1616,15 @@
         }
 
         async function loadGames() {
-            console.log('게임 로딩 중...');
             const { data: games, error } = await sb.from('games').select('*').order('created_at', { ascending: false });
 
             if (error) {
-                console.error('게임 로딩 에러:', error);
                 showNotification('게임을 불러오는데 실패했습니다');
                 return;
             }
 
             if (games) {
                 allGames = games;
-                console.log('게임 로딩 완료:', games.length, '개');
                 displayGames(games, 'allGames');
 
                 if (currentUser) {
@@ -1681,7 +1749,6 @@
 
             if (error) {
                 showNotification('저장 실패: ' + error.message);
-                console.error('저장 에러:', error);
             } else {
                 showNotification(editingGameId ? '게임이 수정되었습니다' : '게임이 생성되었습니다');
                 closeModal('gameModal');
@@ -1718,6 +1785,35 @@
                 
                 openModal('playModal');
                 await loadComments(gameId);
+            }
+        }
+
+        function enterFullscreen() {
+            if (!currentGame) return;
+
+            const fullscreenDiv = document.createElement('div');
+            fullscreenDiv.className = 'fullscreen-mode';
+            fullscreenDiv.innerHTML = `
+                <div class="fullscreen-header">
+                    <div class="fullscreen-title">${currentGame.title}</div>
+                    <button class="exit-fullscreen-btn" onclick="exitFullscreen()">나가기 ✕</button>
+                </div>
+                <iframe class="fullscreen-iframe" id="fullscreenFrame"></iframe>
+            `;
+            
+            document.body.appendChild(fullscreenDiv);
+            
+            const fullscreenFrame = document.getElementById('fullscreenFrame');
+            fullscreenFrame.srcdoc = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+                <style>body{margin:0;padding:20px;background:#f8f9fa;color:#212529;}${currentGame.css_code||''}</style></head>
+                <body>${currentGame.html_code||''}
+                <script>${currentGame.js_code||''}<\/script></body></html>`;
+        }
+
+        function exitFullscreen() {
+            const fullscreenDiv = document.querySelector('.fullscreen-mode');
+            if (fullscreenDiv) {
+                fullscreenDiv.remove();
             }
         }
 
@@ -2382,16 +2478,22 @@
             }, 3000);
         }
 
-        // 초기화
         window.addEventListener('DOMContentLoaded', () => {
-            console.log('페이지 로딩 완료');
             init();
         });
 
-        // Enter 키로 메시지 전송
         document.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && e.target.id === 'messageInput') {
                 sendMessage();
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                const fullscreenDiv = document.querySelector('.fullscreen-mode');
+                if (fullscreenDiv) {
+                    exitFullscreen();
+                }
             }
         });
     </script>
