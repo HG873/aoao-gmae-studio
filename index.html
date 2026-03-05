@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>aoao games - 무료 온라인 게임</title>
+    <title>CrazyGames - 무료 온라인 게임</title>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -631,16 +631,65 @@
             background: #000;
         }
 
+        /* 개선된 Empty State */
         .empty-state {
+            grid-column: 1 / -1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 120px 40px;
             text-align: center;
-            padding: 80px 20px;
-            color: #6c757d;
         }
 
         .empty-state-icon {
-            font-size: 64px;
-            margin-bottom: 16px;
-            opacity: 0.5;
+            font-size: 120px;
+            margin-bottom: 32px;
+            opacity: 0.3;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        .empty-state-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #212529;
+            margin-bottom: 12px;
+        }
+
+        .empty-state-description {
+            font-size: 16px;
+            color: #6c757d;
+            max-width: 400px;
+            line-height: 1.6;
+            margin-bottom: 32px;
+        }
+
+        .empty-state-btn {
+            padding: 12px 32px;
+            background: #0d6efd;
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+        }
+
+        .empty-state-btn:hover {
+            background: #0b5ed7;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(13, 110, 253, 0.4);
         }
 
         /* 알림 애니메이션 */
@@ -921,7 +970,7 @@
 </head>
 <body>
     <header>
-        <div class="logo">🎮 aoaoGames</div>
+        <div class="logo">🎮 CrazyGames</div>
         <div class="search-container">
             <input type="text" class="search-input" id="searchInput" placeholder="게임 검색...">
         </div>
@@ -1436,8 +1485,7 @@
                 .or(`user1_id.eq.${currentUser.id},user2_id.eq.${currentUser.id}`)
                 .eq('status', 'pending');
 
-            const myRequests = friendRequests?.filter(req => req.user2_id === currentUser.
-id) || [];
+            const myRequests = friendRequests?.filter(req => req.user2_id === currentUser.id) || [];
             
             const notifBtn = document.getElementById('notificationBtn');
             if (myRequests.length > 0) {
@@ -1641,7 +1689,14 @@ id) || [];
             if (!container) return;
 
             if (games.length === 0) {
-                container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🎮</div><p>게임이 없습니다</p></div>';
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🎮</div>
+                        <div class="empty-state-title">게임이 없습니다</div>
+                        <div class="empty-state-description">아직 게임이 없어요. 첫 번째 게임을 만들어보시겠어요?</div>
+                        ${currentUser ? '<button class="empty-state-btn" onclick="openCreateGameModal()">게임 만들기</button>' : '<button class="empty-state-btn" onclick="openModal(\'loginModal\')">로그인하기</button>'}
+                    </div>
+                `;
                 return;
             }
 
