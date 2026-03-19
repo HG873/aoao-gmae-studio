@@ -209,14 +209,22 @@ function fail(msg,dest){
 
 (function(){
   var p=new URLSearchParams(location.search);
-  var type    =p.get('type')||'';
+  // type 또는 site 파라미터 둘 다 지원
+  var type    =p.get('type')||p.get('site')||'game'; // aoao-gmae-studio.onrender.com
   var token   =p.get('token')||'';
   var refresh =p.get('refresh')||'';
   var user    =p.get('user')||'';
   var uid     =p.get('uid')||'';
   var adm     =p.get('adm')||'false';
   var pro     =p.get('pro')||'false';
-  var redirect=p.get('redirect')||'/';
+  // 사이트별 기본 URL (redirect 파라미터 없을 때 사용)
+  var SITE_URLS={
+    zeta:'https://aoao-studio-zeta.onrender.com/',
+    typo:'https://aoao-studio-typo.onrender.com/',
+    game:'https://aoao-gmae-studio.onrender.com/',
+    modelhub:'https://aoao-studio-data.onrender.com/'
+  };
+  var redirect=p.get('redirect')||'https://aoao-gmae-studio.onrender.com/';
 
   var name=NAMES[type]||type||'서비스';
   var icon=ICONS[type]||'🌐';
