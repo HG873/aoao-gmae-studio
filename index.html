@@ -1592,8 +1592,10 @@
         async function checkAuth() {
             // ── AOAO Studio 자동 로그인 (auth.html 경유) ──
             const _p=new URLSearchParams(location.search);
-            if(_p.get('token')){
-              try{await sb.auth.setSession({access_token:_p.get('token'),refresh_token:_p.get('refresh')||''});}catch(e){}
+            const _gat=_p.get('gat')||_p.get('token');
+            const _grt=_p.get('grt')||_p.get('refresh')||'';
+            if(_gat){
+              try{await sb.auth.setSession({access_token:_gat,refresh_token:_grt});}catch(e){console.warn('setSession 실패:',e);}
               history.replaceState(null,'',location.pathname);
             }
             // ──────────────────────────────────────────────
