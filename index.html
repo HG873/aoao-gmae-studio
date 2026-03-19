@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CrazyGames - 무료 온라인 게임</title>
-    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * {
@@ -1427,6 +1427,8 @@
 
         const memoryStorage = new MemoryStorage();
 
+        // Supabase CDN 로드 확인
+        if(!window.supabase){console.error('Supabase CDN 로드 실패');throw new Error('Supabase not loaded');}
         const sb = window.supabase.createClient(
             'https://alnazztrdhpkyclkaklv.supabase.co',
             'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsbmF6enRyZGhwa3ljbGtha2x2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg3MzIwNDgsImV4cCI6MjA4NDMwODA0OH0.mUvc6zTV-xNhuBlC0iseVKX1WeNvkGgV_wO4Yl0dGxA',
@@ -1588,6 +1590,13 @@
         }
 
         async function checkAuth() {
+            // ── AOAO Studio 자동 로그인 (auth.html 경유) ──
+            const _p=new URLSearchParams(location.search);
+            if(_p.get('token')){
+              try{await sb.auth.setSession({access_token:_p.get('token'),refresh_token:_p.get('refresh')||''});}catch(e){}
+              history.replaceState(null,'',location.pathname);
+            }
+            // ──────────────────────────────────────────────
             const { data } = await sb.auth.getSession();
             if (data.session) {
                 currentUser = data.session.user;
