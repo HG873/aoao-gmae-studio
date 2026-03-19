@@ -1,285 +1,2567 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>AOAO Studio — 로그인 중</title>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232563eb'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='central' text-anchor='middle' font-family='sans-serif' font-weight='800' font-size='18' fill='white'%3EA%3C/text%3E%3C/svg%3E">
-<style>
-*{margin:0;padding:0;box-sizing:border-box;}
-:root{
-  --bg:#060b18;--navy:#0a1628;
-  --blue:#2563eb;--cyan:#38bdf8;
-  --green:#22c55e;--red:#ef4444;
-  --text:#f0f6ff;--muted:#64748b;
-  --card-bg:rgba(14,22,45,.8);
-  --border:rgba(255,255,255,.06);
-}
-html,body{height:100%;overflow:hidden;}
-body{
-  background:var(--bg);
-  font-family:'Plus Jakarta Sans',sans-serif;
-  color:var(--text);
-  display:flex;align-items:center;justify-content:center;
-  position:relative;
-}
-
-/* 배경 */
-.bg-mesh{
-  position:fixed;inset:0;pointer-events:none;z-index:0;
-  background:
-    radial-gradient(ellipse 90% 70% at 15% 5%,  rgba(37,99,235,.2) 0%,transparent 50%),
-    radial-gradient(ellipse 70% 60% at 85% 95%, rgba(56,189,248,.12) 0%,transparent 50%),
-    radial-gradient(ellipse 50% 50% at 50% 50%, rgba(37,99,235,.05) 0%,transparent 60%);
-}
-canvas#bg{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.4;}
-
-/* 카드 */
-.card{
-  position:relative;z-index:10;
-  width:calc(100% - 40px);max-width:360px;
-  background:var(--card-bg);
-  border:1px solid var(--border);
-  border-radius:28px;
-  padding:48px 36px 40px;
-  backdrop-filter:blur(24px);
-  box-shadow:
-    0 0 0 1px rgba(255,255,255,.04) inset,
-    0 40px 100px rgba(0,0,0,.6),
-    0 0 60px rgba(37,99,235,.08);
-  animation:cardIn .65s cubic-bezier(.16,1,.3,1) both;
-}
-@keyframes cardIn{
-  from{opacity:0;transform:translateY(28px)scale(.96);}
-  to{opacity:1;transform:translateY(0)scale(1);}
-}
-
-/* 로고 */
-.logo{text-align:center;margin-bottom:40px;animation:up .5s .1s ease both;}
-@keyframes up{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
-.logo-mark{
-  display:inline-flex;align-items:center;justify-content:center;
-  width:56px;height:56px;border-radius:18px;
-  background:linear-gradient(140deg,#1d4ed8,#2563eb 40%,#38bdf8);
-  font-size:24px;font-weight:900;color:#fff;
-  margin-bottom:14px;
-  box-shadow:0 8px 28px rgba(37,99,235,.5),0 0 0 1px rgba(255,255,255,.12) inset;
-  position:relative;overflow:hidden;
-}
-.logo-mark::after{
-  content:'';position:absolute;inset:0;
-  background:linear-gradient(135deg,rgba(255,255,255,.15),transparent 50%);
-}
-.logo-name{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.14em;text-transform:uppercase;}
-
-/* 상태 영역 */
-.status{text-align:center;animation:up .5s .18s ease both;}
-
-/* 링 */
-.ring-wrap{
-  position:relative;width:80px;height:80px;margin:0 auto 26px;
-}
-.ring{position:absolute;inset:0;border-radius:50%;}
-.ring-bg{border:1.5px solid rgba(255,255,255,.05);}
-.ring-outer{
-  border:1.5px solid transparent;
-  border-top-color:rgba(37,99,235,.2);
-  border-right-color:rgba(56,189,248,.2);
-  animation:spin 3s linear infinite;
-  inset:-8px;
-}
-.ring-main{
-  border:2px solid transparent;
-  border-top-color:var(--blue);
-  border-right-color:var(--cyan);
-  animation:spin .75s cubic-bezier(.4,0,.6,1) infinite;
-}
-@keyframes spin{to{transform:rotate(360deg);}}
-
-.ring-center{
-  position:absolute;inset:12px;border-radius:50%;
-  background:rgba(37,99,235,.08);border:1px solid rgba(37,99,235,.15);
-  display:flex;align-items:center;justify-content:center;
-  font-size:22px;
-}
-.ring-done{
-  position:absolute;inset:0;border-radius:50%;
-  display:none;align-items:center;justify-content:center;
-  font-size:28px;
-  animation:pop .45s cubic-bezier(.16,1,.3,1) both;
-}
-.ring-done.ok{background:rgba(34,197,94,.1);border:1.5px solid rgba(34,197,94,.25);}
-.ring-done.fail{background:rgba(239,68,68,.1);border:1.5px solid rgba(239,68,68,.25);}
-@keyframes pop{from{transform:scale(.5);opacity:0;}to{transform:scale(1);opacity:1;}}
-
-.s-title{font-size:19px;font-weight:800;margin-bottom:7px;letter-spacing:-.02em;}
-.s-sub{font-size:13px;color:var(--muted);line-height:1.6;}
-
-/* 배지 */
-.badge{
-  display:none;align-items:center;gap:7px;
-  background:rgba(37,99,235,.08);border:1px solid rgba(37,99,235,.15);
-  border-radius:20px;padding:6px 14px;
-  font-size:12px;font-weight:600;color:#93c5fd;
-  margin:18px auto 0;width:fit-content;
-}
-.badge-dot{width:6px;height:6px;border-radius:50%;background:var(--cyan);animation:blink 1.2s ease infinite;}
-@keyframes blink{0%,100%{opacity:1;}50%{opacity:.2;}}
-
-/* 프로그레스 */
-.prog{margin-top:32px;animation:up .5s .28s ease both;}
-.prog-bar{height:2px;background:rgba(255,255,255,.05);border-radius:2px;overflow:hidden;margin-bottom:9px;}
-.prog-fill{height:100%;width:0;border-radius:2px;background:linear-gradient(90deg,var(--blue),var(--cyan));transition:width .2s ease;}
-.prog-meta{display:flex;justify-content:space-between;font-size:10px;font-weight:600;color:rgba(255,255,255,.18);letter-spacing:.04em;text-transform:uppercase;}
-
-/* 에러 */
-.err{
-  display:none;margin-top:18px;padding:12px 14px;
-  background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.2);
-  border-radius:12px;font-size:12px;color:#fca5a5;line-height:1.6;
-}
-</style>
-</head>
-<body>
-<div class="bg-mesh"></div>
-
-<div class="card">
-  <div class="logo">
-    <div class="logo-mark">A</div>
-    <div class="logo-name">AOAO Studio</div>
-  </div>
-
-  <div class="status">
-    <div class="ring-wrap">
-      <div class="ring ring-bg"></div>
-      <div class="ring ring-outer" id="rOuter"></div>
-      <div class="ring ring-main" id="rMain"></div>
-      <div class="ring-center" id="rIcon">🔐</div>
-      <div class="ring-done ok"  id="rOk">✓</div>
-      <div class="ring-done fail" id="rFail">✕</div>
-    </div>
-    <div class="s-title" id="sTitle">로그인 처리 중</div>
-    <div class="s-sub"   id="sSub">잠시만 기다려주세요</div>
-    <div class="badge"   id="badge"><div class="badge-dot"></div><span id="badgeTxt"></span></div>
-  </div>
-
-  <div class="prog">
-    <div class="prog-bar"><div class="prog-fill" id="pFill"></div></div>
-    <div class="prog-meta"><span id="pLabel">세션 초기화</span><span id="pPct">0%</span></div>
-  </div>
-  <div class="err" id="errBox"></div>
-</div>
-
-<script>
-var NAMES={zeta:'AI Girlfriend',typo:'Type Studio',game:'Game Studio',modelhub:'Model Hub'};
-var ICONS={zeta:'💕',typo:'✍️',game:'🎮',modelhub:'🗄️'};
-
-function prog(pct,lbl){
-  document.getElementById('pFill').style.width=pct+'%';
-  document.getElementById('pPct').textContent=pct+'%';
-  if(lbl) document.getElementById('pLabel').textContent=lbl;
-}
-function hideSpinner(){
-  document.getElementById('rOuter').style.display='none';
-  document.getElementById('rMain').style.display='none';
-  document.getElementById('rIcon').style.display='none';
-}
-function done(title,sub,dest){
-  hideSpinner();
-  document.getElementById('rOk').style.display='flex';
-  document.getElementById('sTitle').textContent=title;
-  document.getElementById('sSub').textContent=sub;
-  document.getElementById('badge').style.display='none';
-  prog(100,'완료');
-  setTimeout(function(){location.href=dest||'/';},900);
-}
-function fail(msg,dest){
-  hideSpinner();
-  document.getElementById('rFail').style.display='flex';
-  document.getElementById('sTitle').textContent='오류 발생';
-  document.getElementById('sSub').textContent='';
-  document.getElementById('badge').style.display='none';
-  var eb=document.getElementById('errBox');
-  eb.style.display='block'; eb.textContent=msg;
-  document.getElementById('pFill').style.background='#ef4444';
-  prog(100,'');
-  setTimeout(function(){location.href=dest||'/';},2800);
-}
-
-(function(){
-  var p=new URLSearchParams(location.search);
-  // type 또는 site 파라미터 둘 다 지원
-  var type    =p.get('type')||p.get('site')||'game'; // aoao-gmae-studio.onrender.com
-  var token   =p.get('token')||'';
-  var refresh =p.get('refresh')||'';
-  var user    =p.get('user')||'';
-  var uid     =p.get('uid')||'';
-  var adm     =p.get('adm')||'false';
-  var pro     =p.get('pro')||'false';
-  // 사이트별 기본 URL (redirect 파라미터 없을 때 사용)
-  var SITE_URLS={
-    zeta:'https://aoao-studio-zeta.onrender.com/',
-    typo:'https://aoao-studio-typo.onrender.com/',
-    game:'https://aoao-gmae-studio.onrender.com/',
-    modelhub:'https://aoao-studio-data.onrender.com/'
-  };
-  var redirect=p.get('redirect')||'https://aoao-gmae-studio.onrender.com/';
-
-  var name=NAMES[type]||type||'서비스';
-  var icon=ICONS[type]||'🌐';
-
-  document.getElementById('rIcon').textContent=icon;
-  document.getElementById('badgeTxt').textContent=name+' 연결 중...';
-  document.getElementById('badge').style.display='flex';
-
-  prog(15,'인증 토큰 확인 중');
-
-  setTimeout(function(){
-    prog(45,'세션 데이터 파싱');
-
-    setTimeout(function(){
-      try{
-        prog(70,'localStorage 설정 중');
-
-        if(type==='zeta'){
-          if(!token) return fail('토큰 없음',redirect);
-          localStorage.setItem('z-token',token);
-          if(user) localStorage.setItem('z-user',decodeURIComponent(user));
-          if(refresh) localStorage.setItem('z-refresh',refresh);
-
-        } else if(type==='typo'){
-          if(!token) return fail('토큰 없음',redirect);
-          localStorage.setItem('sb_token',token);
-          if(user) localStorage.setItem('sb_user',decodeURIComponent(user));
-
-        } else if(type==='game'){
-          if(!token) return fail('토큰 없음',redirect);
-          sessionStorage.setItem('game_access_token',token);
-          if(refresh) sessionStorage.setItem('game_refresh_token',refresh);
-
-        } else if(type==='modelhub'){
-          if(!uid) return fail('사용자 정보 없음',redirect);
-          localStorage.setItem('userId',uid);
-          localStorage.setItem('isAdmin',adm);
-          localStorage.setItem('isPro',pro);
-
-        } else {
-          return fail('알 수 없는 타입: '+type, redirect);
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CrazyGames - 무료 온라인 게임</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        prog(90,'리디렉션 준비');
-        document.getElementById('badgeTxt').textContent=name+' 로그인 완료';
-        setTimeout(function(){
-          done(name+' 로그인 완료 ✓','자동으로 이동합니다...',redirect);
-        },350);
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+            background: #f8f9fa;
+            color: #212529;
+            min-height: 100vh;
+        }
 
-      } catch(e){
-        fail('오류: '+e.message, redirect);
-      }
-    }, 400);
-  }, 500);
-})();
-</script>
+        /* 커스텀 스크롤바 */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: #dee2e6 transparent;
+        }
+
+        *::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        *::-webkit-scrollbar-track {
+            background: transparent;
+            margin: 8px 0;
+        }
+
+        *::-webkit-scrollbar-thumb {
+            background: #dee2e6;
+            border-radius: 5px;
+            border: 2px solid transparent;
+            background-clip: padding-box;
+        }
+
+        *::-webkit-scrollbar-thumb:hover {
+            background: #ced4da;
+            border: 2px solid transparent;
+            background-clip: padding-box;
+        }
+
+        /* 헤더 */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 64px;
+            background: #ffffff;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            align-items: center;
+            padding: 0 32px;
+            z-index: 1000;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 700;
+            color: #212529;
+            margin-right: 16px;
+            cursor: pointer;
+        }
+
+        .search-container {
+            flex: 1;
+            max-width: 400px;
+            margin: 0 16px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            height: 36px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 0 12px;
+            color: #212529;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #0d6efd;
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1);
+        }
+
+        .search-input::placeholder {
+            color: #6c757d;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-left: auto;
+        }
+
+        .icon-btn {
+            width: 36px;
+            height: 36px;
+            background: none;
+            border: none;
+            color: #495057;
+            font-size: 18px;
+            cursor: pointer;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .icon-btn:hover {
+            background: #f8f9fa;
+            color: #212529;
+        }
+
+        .btn-login {
+            padding: 8px 16px;
+            background: #0d6efd;
+            border: none;
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-login:hover {
+            background: #0b5ed7;
+        }
+
+        /* 사이드바 */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 64px;
+            width: 280px;
+            height: calc(100vh - 64px);
+            background: #ffffff;
+            border-right: 1px solid #e9ecef;
+            padding: 24px 16px;
+            z-index: 900;
+            overflow-y: auto;
+        }
+
+        .sidebar-section {
+            margin-bottom: 24px;
+        }
+
+        .sidebar-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            padding: 0 12px;
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: #495057;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+            margin-bottom: 2px;
+        }
+
+        .sidebar-item:hover {
+            background: #f8f9fa;
+            color: #212529;
+        }
+
+        .sidebar-item.active {
+            background: #e7f1ff;
+            color: #0d6efd;
+            font-weight: 600;
+        }
+
+        .sidebar-icon {
+            font-size: 20px;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* 메인 컨텐츠 */
+        .main-content {
+            margin-left: 280px;
+            margin-top: 64px;
+            padding: 40px;
+            min-height: calc(100vh - 64px);
+            background: #f8f9fa;
+        }
+
+        .page-header {
+            margin-bottom: 32px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #212529;
+        }
+
+        .page-description {
+            font-size: 16px;
+            color: #6c757d;
+            line-height: 1.5;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #212529;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        .filter-btn {
+            padding: 6px 16px;
+            background: #ffffff;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            color: #495057;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-btn:hover {
+            background: #f8f9fa;
+            border-color: #adb5bd;
+        }
+
+        .filter-btn.active {
+            background: #0d6efd;
+            border-color: #0d6efd;
+            color: #ffffff;
+        }
+
+        /* 게임 그리드 */
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .game-card {
+            background: #ffffff;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .game-card:hover {
+            border-color: #0d6efd;
+            box-shadow: 0 4px 12px rgba(13, 110, 253, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .game-thumb-wrapper {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%;
+            background: linear-gradient(135deg, #e9ecef, #f8f9fa);
+            overflow: hidden;
+        }
+
+        .game-thumb {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .game-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.95);
+            opacity: 0;
+            transition: opacity 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .game-card:hover .game-overlay {
+            opacity: 1;
+        }
+
+        .play-btn {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: #0d6efd;
+            border: none;
+            color: white;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+        }
+
+        .game-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            padding: 6px 12px;
+            background: #dc3545;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .game-badge.new {
+            background: #0d6efd;
+        }
+
+        .game-info {
+            padding: 16px;
+        }
+
+        .game-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #212529;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .game-description {
+            font-size: 14px;
+            color: #6c757d;
+            margin-bottom: 12px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            line-height: 1.5;
+        }
+
+        .game-meta {
+            display: flex;
+            gap: 16px;
+            font-size: 13px;
+            color: #6c757d;
+        }
+
+        .game-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* 모달 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: #ffffff;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #212529;
+        }
+
+        .close-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: transparent;
+            border: none;
+            color: #6c757d;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .close-btn:hover {
+            background: #f8f9fa;
+            color: #212529;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #212529;
+        }
+
+        .form-input,
+        .form-textarea,
+        .form-select {
+            width: 100%;
+            padding: 10px 12px;
+            background: #ffffff;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            color: #212529;
+            font-size: 14px;
+            font-family: inherit;
+            line-height: 1.5;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus,
+        .form-textarea:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1);
+        }
+
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+            font-family: 'Courier New', monospace;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #0d6efd;
+            color: #ffffff;
+        }
+
+        .btn-primary:hover {
+            background: #0b5ed7;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: #ffffff;
+        }
+
+        .btn-secondary:hover {
+            background: #5c636a;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: #ffffff;
+        }
+
+        .btn-danger:hover {
+            background: #bb2d3b;
+        }
+
+        .game-iframe {
+            width: 100%;
+            height: 500px;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            background: #f8f9fa;
+            margin-bottom: 16px;
+        }
+
+        .game-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        /* 전체화면 버튼 */
+        .fullscreen-btn {
+            padding: 10px 20px;
+            background: #198754;
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .fullscreen-btn:hover {
+            background: #157347;
+        }
+
+        /* 전체화면 모드 */
+        .fullscreen-mode {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #000;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .fullscreen-header {
+            height: 50px;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            color: white;
+        }
+
+        .fullscreen-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .exit-fullscreen-btn {
+            padding: 8px 16px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .fullscreen-iframe {
+            flex: 1;
+            border: none;
+            background: #000;
+        }
+
+        /* 개선된 Empty State */
+        .empty-state {
+            grid-column: 1 / -1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 120px 40px;
+            text-align: center;
+        }
+
+        .empty-state-icon {
+            font-size: 120px;
+            margin-bottom: 32px;
+            opacity: 0.3;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        .empty-state-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #212529;
+            margin-bottom: 12px;
+        }
+
+        .empty-state-description {
+            font-size: 16px;
+            color: #6c757d;
+            max-width: 400px;
+            line-height: 1.6;
+            margin-bottom: 32px;
+        }
+
+        .empty-state-btn {
+            padding: 12px 32px;
+            background: #0d6efd;
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+        }
+
+        .empty-state-btn:hover {
+            background: #0b5ed7;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(13, 110, 253, 0.4);
+        }
+
+        /* 알림 애니메이션 */
+        .notification {
+            position: fixed;
+            bottom: -100px;
+            right: 24px;
+            background: #ffffff;
+            border: 1px solid #e9ecef;
+            border-left: 4px solid #198754;
+            border-radius: 8px;
+            padding: 16px 20px;
+            font-size: 14px;
+            color: #212529;
+            z-index: 3000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            animation: slideUp 0.3s ease-out forwards, slideDown 0.3s ease-out 2.7s forwards;
+        }
+
+        @keyframes slideUp {
+            from {
+                bottom: -100px;
+                opacity: 0;
+            }
+            to {
+                bottom: 24px;
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideDown {
+            from {
+                bottom: 24px;
+                opacity: 1;
+            }
+            to {
+                bottom: -100px;
+                opacity: 0;
+            }
+        }
+
+        .create-btn {
+            position: fixed;
+            bottom: 32px;
+            right: 32px;
+            width: 56px;
+            height: 56px;
+            background: #0d6efd;
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(13, 110, 253, 0.4);
+            z-index: 100;
+            display: none;
+            transition: all 0.2s;
+        }
+
+        .create-btn:hover {
+            background: #0b5ed7;
+            transform: scale(1.05);
+        }
+
+        /* 프로필 카드 */
+        .profile-card {
+            background: #ffffff;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .profile-header {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .profile-avatar {
+            width: 96px;
+            height: 96px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0d6efd, #6610f2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            flex-shrink: 0;
+        }
+
+        .profile-info {
+            flex: 1;
+        }
+
+        .profile-name {
+            font-size: 26px;
+            font-weight: 700;
+            color: #212529;
+            margin-bottom: 4px;
+        }
+
+        .profile-bio {
+            font-size: 16px;
+            color: #6c757d;
+            margin-bottom: 16px;
+        }
+
+        .profile-stats {
+            display: flex;
+            gap: 24px;
+            padding: 16px 0;
+            border-top: 1px solid #e9ecef;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #6c757d;
+            font-size: 14px;
+        }
+
+        .stat-value {
+            font-weight: 700;
+            color: #212529;
+        }
+
+        .profile-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        /* 댓글 */
+        .comment-item {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 8px;
+        }
+
+        .comment-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .comment-author {
+            font-weight: 700;
+            color: #0d6efd;
+            font-size: 14px;
+        }
+
+        .comment-time {
+            font-size: 12px;
+            color: #6c757d;
+        }
+
+        .comment-body {
+            font-size: 14px;
+            color: #212529;
+            line-height: 1.5;
+        }
+
+        /* 유저 리스트 */
+        .user-list-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 1px solid #e9ecef;
+            transition: background 0.2s;
+        }
+
+        .user-list-item:hover {
+            background: #f8f9fa;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0d6efd, #6610f2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: #212529;
+            margin-bottom: 2px;
+        }
+
+        .user-bio {
+            font-size: 13px;
+            color: #6c757d;
+        }
+
+        /* 메시지 */
+        .message-item {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .message-item.mine {
+            flex-direction: row-reverse;
+        }
+
+        .message-bubble {
+            max-width: 70%;
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .message-item.mine .message-bubble {
+            background: #0d6efd;
+            color: white;
+        }
+
+        .message-item:not(.mine) .message-bubble {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            color: #212529;
+        }
+
+        .message-time {
+            font-size: 11px;
+            color: #6c757d;
+            margin-top: 4px;
+        }
+
+        /* 반응형 */
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-280px);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            header {
+                padding: 0 16px;
+            }
+
+            .search-container {
+                max-width: 200px;
+            }
+
+            .main-content {
+                padding: 24px 16px;
+            }
+
+            .games-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">🎮 CrazyGames</div>
+        <div class="search-container">
+            <input type="text" class="search-input" id="searchInput" placeholder="게임 검색...">
+        </div>
+        <div class="header-actions">
+            <button class="icon-btn" onclick="openDM()" title="메시지">💬</button>
+            <button class="icon-btn" onclick="openNotifications()" title="알림" id="notificationBtn">🔔</button>
+            <button class="icon-btn" onclick="openUserSearch()" title="검색">👤</button>
+            <button class="icon-btn" onclick="navigateToSection('favorites')" title="즐겨찾기">💖</button>
+            <button class="btn-login" id="headerBtn" onclick="openModal('loginModal')">로그인</button>
+        </div>
+    </header>
+
+    <aside class="sidebar">
+        <div class="sidebar-section">
+            <div class="sidebar-title">탐색</div>
+            <div class="sidebar-item active" data-section="home">
+                <span class="sidebar-icon">🏠</span>
+                <span>홈</span>
+            </div>
+            <div class="sidebar-item" data-section="new">
+                <span class="sidebar-icon">✨</span>
+                <span>신규</span>
+            </div>
+            <div class="sidebar-item" data-section="trending">
+                <span class="sidebar-icon">🔥</span>
+                <span>인기</span>
+            </div>
+        </div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-title">카테고리</div>
+            <div class="sidebar-item" data-section="action">
+                <span class="sidebar-icon">⚔️</span>
+                <span>액션</span>
+            </div>
+            <div class="sidebar-item" data-section="adventure">
+                <span class="sidebar-icon">🗺️</span>
+                <span>어드벤처</span>
+            </div>
+            <div class="sidebar-item" data-section="puzzle">
+                <span class="sidebar-icon">🧩</span>
+                <span>퍼즐</span>
+            </div>
+            <div class="sidebar-item" data-section="racing">
+                <span class="sidebar-icon">🏎️</span>
+                <span>레이싱</span>
+            </div>
+            <div class="sidebar-item" data-section="sports">
+                <span class="sidebar-icon">⚽</span>
+                <span>스포츠</span>
+            </div>
+            <div class="sidebar-item" data-section="arcade">
+                <span class="sidebar-icon">🕹️</span>
+                <span>아케이드</span>
+            </div>
+        </div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-title">내 게임</div>
+            <div class="sidebar-item" data-section="favorites">
+                <span class="sidebar-icon">💖</span>
+                <span>즐겨찾기</span>
+            </div>
+            <div class="sidebar-item" data-section="my-games">
+                <span class="sidebar-icon">📁</span>
+                <span>내가 만든 게임</span>
+            </div>
+            <div class="sidebar-item" data-section="profile">
+                <span class="sidebar-icon">👤</span>
+                <span>프로필</span>
+            </div>
+        </div>
+    </aside>
+
+    <main class="main-content" id="mainContent">
+        <div id="homeView">
+            <div class="page-header">
+                <div class="page-title">게임 탐색</div>
+                <div class="page-description">수천 가지 무료 온라인 게임을 플레이하세요</div>
+            </div>
+
+            <div class="section-header">
+                <div class="section-title">모든 게임</div>
+                <div class="filter-group">
+                    <button class="filter-btn active">최신순</button>
+                    <button class="filter-btn">인기순</button>
+                    <button class="filter-btn">이름순</button>
+                </div>
+            </div>
+            
+            <div class="games-grid" id="allGames"></div>
+        </div>
+
+        <div id="sectionView" style="display: none;">
+            <div class="page-header">
+                <div class="page-title" id="sectionTitle">액션 게임</div>
+                <div class="page-description" id="sectionDescription">최고의 액션 게임을 플레이하세요</div>
+            </div>
+
+            <div class="section-header">
+                <div class="section-title">게임 목록</div>
+            </div>
+            
+            <div class="games-grid" id="sectionGames"></div>
+        </div>
+
+        <div id="profileView" style="display: none;">
+            <div class="page-header">
+                <div class="page-title">프로필</div>
+            </div>
+            
+            <div class="profile-card">
+                <div class="profile-header">
+                    <div class="profile-avatar" id="profileAvatar">👤</div>
+                    <div class="profile-info">
+                        <div class="profile-name" id="profileUsername">사용자</div>
+                        <div class="profile-bio" id="profileBio">아직 소개가 없습니다</div>
+                    </div>
+                </div>
+
+                <div class="profile-stats">
+                    <div class="stat-item">
+                        <span>👥</span>
+                        <span><span class="stat-value">0</span> 팔로워</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>👥</span>
+                        <span><span class="stat-value">0</span> 팔로잉</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>🎮</span>
+                        <span><span class="stat-value" id="profileGameCount">0</span> 게임</span>
+                    </div>
+                </div>
+
+                <div class="profile-actions">
+                    <button class="btn btn-primary" onclick="openModal('editProfileModal')">프로필 편집</button>
+                    <button class="btn btn-secondary" onclick="showFollowers()">팔로워</button>
+                    <button class="btn btn-secondary" onclick="showFollowing()">팔로잉</button>
+                </div>
+            </div>
+
+            <div class="section-header">
+                <div class="section-title">내 게임</div>
+            </div>
+
+            <div class="games-grid" id="profileGames"></div>
+        </div>
+    </main>
+
+    <button class="create-btn" id="createBtn" onclick="openCreateGameModal()" title="게임 만들기">+</button>
+
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">로그인</h2>
+                <button class="close-btn" onclick="closeModal('loginModal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">이메일</label>
+                    <input type="email" class="form-input" id="loginEmail" placeholder="이메일 주소">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">비밀번호</label>
+                    <input type="password" class="form-input" id="loginPassword" placeholder="비밀번호">
+                </div>
+                <button class="btn btn-primary" onclick="login()" style="width: 100%; margin-bottom: 8px;">로그인</button>
+                <button class="btn btn-secondary" onclick="switchModal('loginModal', 'signupModal')" style="width: 100%;">계정 만들기</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="signupModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">가입하기</h2>
+                <button class="close-btn" onclick="closeModal('signupModal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">사용자 이름</label>
+                    <input type="text" class="form-input" id="signupUsername" placeholder="사용자 이름">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">이메일</label>
+                    <input type="email" class="form-input" id="signupEmail" placeholder="이메일 주소">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">비밀번호</label>
+                    <input type="password" class="form-input" id="signupPassword" placeholder="비밀번호 (최소 6자)">
+                </div>
+                <button class="btn btn-primary" onclick="signup()" style="width: 100%;">계정 만들기</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="gameModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="gameModalTitle">게임 만들기</h2>
+                <button class="close-btn" onclick="closeModal('gameModal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">게임 제목 *</label>
+                    <input type="text" class="form-input" id="gameTitle" placeholder="멋진 게임">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">설명</label>
+                    <textarea class="form-textarea" id="gameDescription" placeholder="게임에 대해 설명해주세요..." style="font-family: inherit; min-height: 80px;"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">썸네일 URL</label>
+                    <input type="text" class="form-input" id="gameThumbnail" placeholder="https://example.com/image.png">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">조작법</label>
+                    <input type="text" class="form-input" id="gameControls" placeholder="예: 방향키로 이동">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">카테고리</label>
+                    <select class="form-select" id="gameCategory">
+                        <option value="action">액션</option>
+                        <option value="adventure">어드벤처</option>
+                        <option value="puzzle">퍼즐</option>
+                        <option value="racing">레이싱</option>
+                        <option value="sports">스포츠</option>
+                        <option value="arcade">아케이드</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">서버 URL (선택사항)</label>
+                    <input type="text" class="form-input" id="gameServerUrl" placeholder="멀티플레이어용 WebSocket 서버">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">HTML 코드</label>
+                    <textarea class="form-textarea" id="gameHtml" placeholder="게임 HTML 코드"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">CSS 코드</label>
+                    <textarea class="form-textarea" id="gameCss" placeholder="스타일 코드"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">JavaScript 코드</label>
+                    <textarea class="form-textarea" id="gameJs" placeholder="게임 로직 코드"></textarea>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn btn-primary" onclick="saveGame()" style="flex: 1;">저장</button>
+                    <button class="btn btn-secondary" onclick="previewGame()">미리보기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="playModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="playGameTitle">게임</h2>
+                <button class="close-btn" onclick="closeModal('playModal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <p id="playGameDescription" style="color: #6c757d; margin-bottom: 8px; font-size: 14px;"></p>
+                <p id="playGameControls" style="color: #0d6efd; font-weight: 600; margin-bottom: 16px; font-size: 13px;"></p>
+                
+                <iframe id="gameFrame" class="game-iframe"></iframe>
+                
+                <div class="game-actions">
+                    <button class="fullscreen-btn" onclick="enterFullscreen()">🖥️ 전체화면</button>
+                    <button class="btn btn-primary" onclick="toggleHeart()">❤️ <span id="heartCount">0</span></button>
+                    <button class="btn btn-secondary" onclick="toggleFavorite()">⭐ 저장</button>
+                    <button class="btn btn-secondary" onclick="editCurrentGame()">✏️ 수정</button>
+                    <button class="btn btn-danger" onclick="deleteCurrentGame()">🗑️ 삭제</button>
+                    <button class="btn btn-secondary" onclick="shareGame()">🔗 공유</button>
+                </div>
+
+                <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #e9ecef;">
+                    <h3 style="margin-bottom: 12px; font-size: 16px; font-weight: 700; color: #212529;">댓글</h3>
+                    <div class="form-group">
+                        <textarea class="form-textarea" id="commentInput" placeholder="댓글 달기..." style="min-height: 80px; font-family: inherit;"></textarea>
+                        <button class="btn btn-primary" onclick="addComment()" style="margin-top: 8px;">댓글 작성</button>
+                    </div>
+                    <div id="commentsList" style="margin-top: 16px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="editProfileModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">프로필 편집</h2>
+                <button class="close-btn" onclick="closeModal('editProfileModal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">사용자 이름</label>
+                    <input type="text" class="form-input" id="editUsername" placeholder="사용자 이름">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">소개</label>
+                    <textarea class="form-textarea" id="editBio" placeholder="자신을 소개해주세요" style="font-family: inherit; min-height: 80px;"></textarea>
+                </div>
+                <button class="btn btn-primary" onclick="updateProfile()" style="width: 100%;">저장</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="followersModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">팔로워</h2>
+                <button class="close-btn" onclick="closeModal('followersModal')">✕</button>
+            </div>
+            <div class="modal-body" style="padding: 0;">
+                <div id="followersList"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="followingModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">팔로잉</h2>
+                <button class="close-btn" onclick="closeModal('followingModal')">✕</button>
+            </div>
+            <div class="modal-body" style="padding: 0;">
+                <div id="followingList"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="notificationsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">알림</h2>
+                <button class="close-btn" onclick="closeModal('notificationsModal')">✕</button>
+            </div>
+            <div class="modal-body" style="padding: 0;">
+                <div id="notificationsList"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="userSearchModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">사용자 검색</h2>
+                <button class="close-btn" onclick="closeModal('userSearchModal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <input type="text" class="form-input" id="userSearchInput" placeholder="사용자 이름 검색...">
+                </div>
+                <div id="userSearchResults"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="otherUserProfileModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="otherUserProfileTitle">프로필</h2>
+                <button class="close-btn" onclick="closeModal('otherUserProfileModal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="profile-card">
+                    <div class="profile-header">
+                        <div class="profile-avatar" id="otherUserAvatar">👤</div>
+                        <div class="profile-info">
+                            <div class="profile-name" id="otherUsername">사용자</div>
+                            <div class="profile-bio" id="otherUserBio">소개 없음</div>
+                        </div>
+                    </div>
+
+                    <div class="profile-stats">
+                        <div class="stat-item">
+                            <span>👥</span>
+                            <span><span class="stat-value" id="otherFollowerCount">0</span> 팔로워</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>👥</span>
+                            <span><span class="stat-value" id="otherFollowingCount">0</span> 팔로잉</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>🎮</span>
+                            <span><span class="stat-value" id="otherGameCount">0</span> 게임</span>
+                        </div>
+                    </div>
+
+                    <div class="profile-actions">
+                        <button class="btn btn-primary" id="followBtn" onclick="followUser()">팔로우</button>
+                        <button class="btn btn-secondary" id="friendBtn" onclick="sendFriendRequestToUser()">친구 추가</button>
+                        <button class="btn btn-secondary" onclick="startDMWithUser()">메시지</button>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 24px;">
+                    <div class="section-title" style="margin-bottom: 16px;">게임</div>
+                    <div class="games-grid" id="otherUserGames"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="dmModal" class="modal">
+        <div class="modal-content" style="max-width: 900px; height: 600px; display: flex; flex-direction: column;">
+            <div class="modal-header">
+                <h2 class="modal-title">메시지</h2>
+                <button class="close-btn" onclick="closeModal('dmModal')">✕</button>
+            </div>
+            <div style="display: flex; flex: 1; overflow: hidden;">
+                <div style="width: 250px; border-right: 1px solid #e9ecef; overflow-y: auto; background: #f8f9fa;">
+                    <div id="conversationsList"></div>
+                </div>
+                
+                <div style="flex: 1; display: flex; flex-direction: column; background: #ffffff;">
+                    <div id="dmHeader" style="padding: 16px; border-bottom: 1px solid #e9ecef; display: none;">
+                        <h3 id="dmRecipientName" style="font-size: 16px; font-weight: 700; color: #212529;"></h3>
+                    </div>
+                    
+                    <div id="messagesArea" style="flex: 1; overflow-y: auto; padding: 16px; background: #f8f9fa;">
+                        <div style="text-align: center; color: #6c757d; padding: 80px 20px; font-size: 14px;">
+                            대화를 선택해주세요
+                        </div>
+                    </div>
+                    
+                    <div id="messageInputArea" style="padding: 16px; border-top: 1px solid #e9ecef; background: #ffffff; display: none;">
+                        <div style="display: flex; gap: 8px;">
+                            <input type="text" class="form-input" id="messageInput" placeholder="메시지 입력..." style="flex: 1;">
+                            <button class="btn btn-primary" onclick="sendMessage()">전송</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class MemoryStorage {
+            constructor() {
+                this.store = {};
+            }
+            getItem(key) {
+                return this.store[key] || null;
+            }
+            setItem(key, value) {
+                this.store[key] = value;
+            }
+            removeItem(key) {
+                delete this.store[key];
+            }
+        }
+
+        const memoryStorage = new MemoryStorage();
+
+        // Supabase CDN 로드 확인
+        if(!window.supabase){console.error('Supabase CDN 로드 실패');throw new Error('Supabase not loaded');}
+        const sb = window.supabase.createClient(
+            'https://alnazztrdhpkyclkaklv.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsbmF6enRyZGhwa3ljbGtha2x2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg3MzIwNDgsImV4cCI6MjA4NDMwODA0OH0.mUvc6zTV-xNhuBlC0iseVKX1WeNvkGgV_wO4Yl0dGxA',
+            {
+                auth: {
+                    storage: memoryStorage,
+                    autoRefreshToken: true,
+                    persistSession: false,
+                    detectSessionInUrl: false
+                }
+            }
+        );
+
+        let currentUser = null;
+        let currentGame = null;
+        let editingGameId = null;
+        let allGames = [];
+        let currentViewingUser = null;
+        let currentRecipient = null;
+
+        const sectionInfo = {
+            'home': { title: '게임 탐색', desc: '수천 가지 무료 온라인 게임을 플레이하세요' },
+            'new': { title: '신규 게임', desc: '최근 추가된 게임' },
+            'trending': { title: '인기 게임', desc: '지금 가장 핫한 게임' },
+            'action': { title: '액션', desc: '강렬한 액션 게임' },
+            'adventure': { title: '어드벤처', desc: '모험을 떠나보세요' },
+            'puzzle': { title: '퍼즐', desc: '두뇌를 자극하는 퍼즐' },
+            'racing': { title: '레이싱', desc: '스피드의 짜릿함' },
+            'sports': { title: '스포츠', desc: '스포츠의 재미' },
+            'arcade': { title: '아케이드', desc: '클래식 아케이드' },
+            'favorites': { title: '즐겨찾기', desc: '저장한 게임' },
+            'my-games': { title: '내 게임', desc: '내가 만든 게임' },
+            'profile': { title: '프로필', desc: '' }
+        };
+
+        async function init() {
+            await checkAuth();
+            await loadGames();
+            setupEventListeners();
+            
+            if (currentUser) {
+                setInterval(async () => {
+                    if (currentUser) {
+                        await checkNewNotifications();
+                    }
+                }, 30000);
+            }
+        }
+
+        async function checkNewNotifications() {
+            if (!currentUser) return;
+
+            const { data: friendRequests } = await sb
+                .from('friendships')
+                .select('id')
+                .or(`user1_id.eq.${currentUser.id},user2_id.eq.${currentUser.id}`)
+                .eq('status', 'pending');
+
+            const myRequests = friendRequests?.filter(req => req.user2_id === currentUser.id) || [];
+            
+            const notifBtn = document.getElementById('notificationBtn');
+            if (myRequests.length > 0) {
+                notifBtn.style.position = 'relative';
+                notifBtn.innerHTML = '🔔<span style="position: absolute; top: 2px; right: 2px; width: 8px; height: 8px; background: #0d6efd; border-radius: 50%;"></span>';
+            } else {
+                notifBtn.innerHTML = '🔔';
+            }
+        }
+
+        function setupEventListeners() {
+            document.querySelectorAll('.sidebar-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const section = this.getAttribute('data-section');
+                    navigateToSection(section);
+                    
+                    document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+
+            document.getElementById('searchInput').addEventListener('input', (e) => {
+                searchGames(e.target.value);
+            });
+        }
+
+        function navigateToSection(section) {
+            document.getElementById('homeView').style.display = 'none';
+            document.getElementById('sectionView').style.display = 'none';
+            document.getElementById('profileView').style.display = 'none';
+            document.getElementById('createBtn').style.display = 'none';
+
+            if (section === 'home') {
+                document.getElementById('homeView').style.display = 'block';
+                displayGames(allGames, 'allGames');
+            } else if (section === 'profile') {
+                if (!currentUser) {
+                    showNotification('먼저 로그인해주세요');
+                    openModal('loginModal');
+                    return;
+                }
+                document.getElementById('profileView').style.display = 'block';
+            } else {
+                showSectionView(section);
+            }
+        }
+
+        function showSectionView(section) {
+            document.getElementById('sectionView').style.display = 'block';
+            
+            const info = sectionInfo[section];
+            document.getElementById('sectionTitle').textContent = info.title;
+            document.getElementById('sectionDescription').textContent = info.desc;
+
+            if (section === 'my-games') {
+                if (!currentUser) {
+                    showNotification('먼저 로그인해주세요');
+                    openModal('loginModal');
+                    navigateToSection('home');
+                    return;
+                }
+                document.getElementById('createBtn').style.display = 'block';
+                const myGames = allGames.filter(g => g.user_id === currentUser.id);
+                displayGames(myGames, 'sectionGames');
+            } else if (section === 'new') {
+                const newGames = allGames.filter(g => {
+                    const date = new Date(g.created_at);
+                    return (new Date() - date) < 7 * 24 * 60 * 60 * 1000;
+                });
+                displayGames(newGames, 'sectionGames');
+            } else if (section === 'trending') {
+                const trending = [...allGames].sort((a, b) => (b.hearts || 0) - (a.hearts || 0));
+                displayGames(trending, 'sectionGames');
+            } else if (section === 'favorites') {
+                if (!currentUser) {
+                    showNotification('먼저 로그인해주세요');
+                    openModal('loginModal');
+                    navigateToSection('home');
+                    return;
+                }
+                loadFavorites();
+            } else {
+                const filtered = allGames.filter(g => g.category === section);
+                displayGames(filtered, 'sectionGames');
+            }
+        }
+
+        async function loadFavorites() {
+            const { data: favorites } = await sb.from('favorites').select('game_id').eq('user_id', currentUser.id);
+
+            if (favorites) {
+                const gameIds = favorites.map(f => f.game_id);
+                if (gameIds.length > 0) {
+                    const { data: games } = await sb.from('games').select('*').in('id', gameIds);
+                    displayGames(games || [], 'sectionGames');
+                } else {
+                    displayGames([], 'sectionGames');
+                }
+            }
+        }
+
+        async function checkAuth() {
+            // ── AOAO Studio 자동 로그인 (auth.html 경유) ──
+            const _p=new URLSearchParams(location.search);
+            const _gat=_p.get('gat')||_p.get('token');
+            const _grt=_p.get('grt')||_p.get('refresh')||'';
+            if(_gat){
+              try{await sb.auth.setSession({access_token:_gat,refresh_token:_grt});}catch(e){console.warn('setSession 실패:',e);}
+              history.replaceState(null,'',location.pathname);
+            }
+            // ──────────────────────────────────────────────
+            const { data } = await sb.auth.getSession();
+            if (data.session) {
+                currentUser = data.session.user;
+                updateHeader();
+            }
+        }
+
+        function updateHeader() {
+            if (currentUser) {
+                document.getElementById('headerBtn').textContent = '로그아웃';
+                document.getElementById('headerBtn').onclick = logout;
+            }
+        }
+
+        async function login() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            if (!email || !password) {
+                showNotification('이메일과 비밀번호를 입력해주세요');
+                return;
+            }
+
+            const { data, error } = await sb.auth.signInWithPassword({ email, password });
+
+            if (error) {
+                showNotification('로그인 실패: ' + error.message);
+            } else {
+                currentUser = data.user;
+                closeModal('loginModal');
+                showNotification('환영합니다!');
+                updateHeader();
+                await loadGames();
+            }
+        }
+
+        async function signup() {
+            const username = document.getElementById('signupUsername').value;
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+
+            if (!username || !email || !password) {
+                showNotification('모든 항목을 입력해주세요');
+                return;
+            }
+
+            const { data, error } = await sb.auth.signUp({ email, password });
+
+            if (error) {
+                showNotification('회원가입 실패: ' + error.message);
+            } else {
+                await sb.from('profiles').insert([{ id: data.user.id, username: username, bio: '' }]);
+                
+                if (data.session) {
+                    currentUser = data.user;
+                    closeModal('signupModal');
+                    showNotification('환영합니다!');
+                    updateHeader();
+                    await loadGames();
+                } else {
+                    showNotification('회원가입 성공! 로그인해주세요');
+                    switchModal('signupModal', 'loginModal');
+                }
+            }
+        }
+
+        async function logout() {
+            await sb.auth.signOut();
+            currentUser = null;
+            document.getElementById('headerBtn').textContent = '로그인';
+            document.getElementById('headerBtn').onclick = () => openModal('loginModal');
+            showNotification('로그아웃되었습니다');
+            navigateToSection('home');
+        }
+
+        async function loadGames() {
+            const { data: games, error } = await sb.from('games').select('*').order('created_at', { ascending: false });
+
+            if (error) {
+                showNotification('게임을 불러오는데 실패했습니다');
+                return;
+            }
+
+            if (games) {
+                allGames = games;
+                displayGames(games, 'allGames');
+
+                if (currentUser) {
+                    await loadUserProfile();
+                    const myGames = games.filter(g => g.user_id === currentUser.id);
+                    displayGames(myGames, 'profileGames');
+                    await loadNotifications();
+                }
+            }
+        }
+
+        function displayGames(games, containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            if (games.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🎮</div>
+                        <div class="empty-state-title">게임이 없습니다</div>
+                        <div class="empty-state-description">아직 게임이 없어요. 첫 번째 게임을 만들어보시겠어요?</div>
+                        ${currentUser ? '<button class="empty-state-btn" onclick="openCreateGameModal()">게임 만들기</button>' : '<button class="empty-state-btn" onclick="openModal(\'loginModal\')">로그인하기</button>'}
+                    </div>
+                `;
+                return;
+            }
+
+            const placeholderSVG = `data:image/svg+xml,%3Csvg width='640' height='360' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='640' height='360' fill='%23e9ecef'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='64' fill='%236c757d'%3E🎮%3C/text%3E%3C/svg%3E`;
+
+            container.innerHTML = games.map(game => {
+                const isNew = (() => {
+                    const date = new Date(game.created_at);
+                    return (new Date() - date) < 7 * 24 * 60 * 60 * 1000;
+                })();
+                
+                const isHot = (game.hearts || 0) > 10;
+                
+                return `
+                    <div class="game-card" onclick="playGame('${game.id}')">
+                        <div class="game-thumb-wrapper">
+                            <img src="${game.thumbnail_url || placeholderSVG}" 
+                                 alt="${game.title}" 
+                                 class="game-thumb"
+                                 onerror="this.src='${placeholderSVG}'">
+                            <div class="game-overlay">
+                                <div class="play-btn">▶</div>
+                            </div>
+                            ${isHot ? '<div class="game-badge">HOT</div>' : ''}
+                            ${isNew && !isHot ? '<div class="game-badge new">NEW</div>' : ''}
+                        </div>
+                        <div class="game-info">
+                            <div class="game-title">${game.title}</div>
+                            ${game.description ? `<div class="game-description">${game.description}</div>` : ''}
+                            <div class="game-meta">
+                                <div class="game-meta-item">
+                                    <span>📁</span>
+                                    <span>${getCategoryName(game.category)}</span>
+                                </div>
+                                <div class="game-meta-item">
+                                    <span>❤️</span>
+                                    <span>${game.hearts || 0}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function getCategoryName(category) {
+            const categories = {
+                'action': '액션', 'adventure': '어드벤처', 'puzzle': '퍼즐',
+                'racing': '레이싱', 'sports': '스포츠', 'arcade': '아케이드'
+            };
+            return categories[category] || '게임';
+        }
+
+        function openCreateGameModal() {
+            if (!currentUser) {
+                showNotification('먼저 로그인해주세요');
+                openModal('loginModal');
+                return;
+            }
+            
+            editingGameId = null;
+            document.getElementById('gameModalTitle').textContent = '게임 만들기';
+            document.getElementById('gameTitle').value = '';
+            document.getElementById('gameDescription').value = '';
+            document.getElementById('gameThumbnail').value = '';
+            document.getElementById('gameControls').value = '';
+            document.getElementById('gameCategory').value = 'action';
+            document.getElementById('gameServerUrl').value = '';
+            document.getElementById('gameHtml').value = '';
+            document.getElementById('gameCss').value = '';
+            document.getElementById('gameJs').value = '';
+            openModal('gameModal');
+        }
+
+        async function saveGame() {
+            if (!currentUser) {
+                showNotification('먼저 로그인해주세요');
+                return;
+            }
+
+            const gameData = {
+                title: document.getElementById('gameTitle').value,
+                description: document.getElementById('gameDescription').value,
+                thumbnail_url: document.getElementById('gameThumbnail').value,
+                controls: document.getElementById('gameControls').value,
+                category: document.getElementById('gameCategory').value,
+                server_url: document.getElementById('gameServerUrl').value || null,
+                html_code: document.getElementById('gameHtml').value,
+                css_code: document.getElementById('gameCss').value,
+                js_code: document.getElementById('gameJs').value,
+                user_id: currentUser.id
+            };
+
+            if (!gameData.title) {
+                showNotification('제목을 입력해주세요');
+                return;
+            }
+
+            let error;
+            if (editingGameId) {
+                ({ error } = await sb.from('games').update(gameData).eq('id', editingGameId));
+            } else {
+                ({ error } = await sb.from('games').insert([gameData]));
+            }
+
+            if (error) {
+                showNotification('저장 실패: ' + error.message);
+            } else {
+                showNotification(editingGameId ? '게임이 수정되었습니다' : '게임이 생성되었습니다');
+                closeModal('gameModal');
+                await loadGames();
+                editingGameId = null;
+            }
+        }
+
+        function previewGame() {
+            const html = document.getElementById('gameHtml').value;
+            const css = document.getElementById('gameCss').value;
+            const js = document.getElementById('gameJs').value;
+
+            const preview = window.open('', '_blank');
+            preview.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+                <style>${css}</style></head><body>${html}<script>${js}<\/script></body></html>`);
+        }
+
+        async function playGame(gameId) {
+            const { data: game } = await sb.from('games').select('*').eq('id', gameId).single();
+
+            if (game) {
+                currentGame = game;
+                document.getElementById('playGameTitle').textContent = game.title;
+                document.getElementById('playGameDescription').textContent = game.description || '';
+                document.getElementById('playGameControls').textContent = game.controls ? '🎮 ' + game.controls : '';
+                document.getElementById('heartCount').textContent = game.hearts || 0;
+
+                const iframe = document.getElementById('gameFrame');
+                iframe.srcdoc = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+                    <style>body{margin:0;padding:20px;background:#f8f9fa;color:#212529;}${game.css_code||''}</style></head>
+                    <body>${game.html_code||'<div style="text-align:center;padding:100px;"><h2>게임 코드가 없습니다</h2></div>'}
+                    <script>${game.js_code||''}<\/script></body></html>`;
+                
+                openModal('playModal');
+                await loadComments(gameId);
+            }
+        }
+
+        function enterFullscreen() {
+            if (!currentGame) return;
+
+            const fullscreenDiv = document.createElement('div');
+            fullscreenDiv.className = 'fullscreen-mode';
+            fullscreenDiv.innerHTML = `
+                <div class="fullscreen-header">
+                    <div class="fullscreen-title">${currentGame.title}</div>
+                    <button class="exit-fullscreen-btn" onclick="exitFullscreen()">나가기 ✕</button>
+                </div>
+                <iframe class="fullscreen-iframe" id="fullscreenFrame"></iframe>
+            `;
+            
+            document.body.appendChild(fullscreenDiv);
+            
+            const fullscreenFrame = document.getElementById('fullscreenFrame');
+            fullscreenFrame.srcdoc = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+                <style>body{margin:0;padding:20px;background:#f8f9fa;color:#212529;}${currentGame.css_code||''}</style></head>
+                <body>${currentGame.html_code||''}
+                <script>${currentGame.js_code||''}<\/script></body></html>`;
+        }
+
+        function exitFullscreen() {
+            const fullscreenDiv = document.querySelector('.fullscreen-mode');
+            if (fullscreenDiv) {
+                fullscreenDiv.remove();
+            }
+        }
+
+        function editCurrentGame() {
+            if (!currentUser || !currentGame || currentGame.user_id !== currentUser.id) {
+                showNotification('자신의 게임만 수정할 수 있습니다');
+                return;
+            }
+
+            editingGameId = currentGame.id;
+            document.getElementById('gameModalTitle').textContent = '게임 수정';
+            document.getElementById('gameTitle').value = currentGame.title;
+            document.getElementById('gameDescription').value = currentGame.description || '';
+            document.getElementById('gameThumbnail').value = currentGame.thumbnail_url || '';
+            document.getElementById('gameControls').value = currentGame.controls || '';
+            document.getElementById('gameCategory').value = currentGame.category || 'action';
+            document.getElementById('gameServerUrl').value = currentGame.server_url || '';
+            document.getElementById('gameHtml').value = currentGame.html_code || '';
+            document.getElementById('gameCss').value = currentGame.css_code || '';
+            document.getElementById('gameJs').value = currentGame.js_code || '';
+            closeModal('playModal');
+            openModal('gameModal');
+        }
+
+        async function deleteCurrentGame() {
+            if (!currentUser || !currentGame || currentGame.user_id !== currentUser.id) {
+                showNotification('자신의 게임만 삭제할 수 있습니다');
+                return;
+            }
+
+            if (!confirm('게임을 삭제하시겠습니까?')) return;
+
+            const { error } = await sb.from('games').delete().eq('id', currentGame.id);
+
+            if (!error) {
+                showNotification('게임이 삭제되었습니다');
+                closeModal('playModal');
+                await loadGames();
+            }
+        }
+
+        async function toggleHeart() {
+            if (!currentUser || !currentGame) {
+                showNotification('먼저 로그인해주세요');
+                return;
+            }
+
+            const { data: existing } = await sb.from('hearts').select('*').eq('user_id', currentUser.id).eq('game_id', currentGame.id).single();
+
+            if (existing) {
+                await sb.from('hearts').delete().eq('id', existing.id);
+                await sb.from('games').update({ hearts: (currentGame.hearts || 1) - 1 }).eq('id', currentGame.id);
+                showNotification('좋아요 취소');
+            } else {
+                await sb.from('hearts').insert([{ user_id: currentUser.id, game_id: currentGame.id }]);
+                await sb.from('games').update({ hearts: (currentGame.hearts || 0) + 1 }).eq('id', currentGame.id);
+                showNotification('좋아요!');
+            }
+
+            await loadGames();
+            document.getElementById('heartCount').textContent = (parseInt(document.getElementById('heartCount').textContent) + (existing ? -1 : 1));
+        }
+
+        async function toggleFavorite() {
+            if (!currentUser || !currentGame) {
+                showNotification('먼저 로그인해주세요');
+                return;
+            }
+
+            const { data: existing } = await sb.from('favorites').select('*').eq('user_id', currentUser.id).eq('game_id', currentGame.id).single();
+
+            if (existing) {
+                await sb.from('favorites').delete().eq('id', existing.id);
+                showNotification('저장 취소');
+            } else {
+                await sb.from('favorites').insert([{ user_id: currentUser.id, game_id: currentGame.id }]);
+                showNotification('저장됨');
+            }
+        }
+
+        function shareGame() {
+            if (!currentGame) return;
+            
+            const url = window.location.href.split('?')[0] + '?game=' + currentGame.id;
+            
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(url).then(() => {
+                    showNotification('링크가 복사되었습니다');
+                });
+            }
+        }
+
+        async function loadComments(gameId) {
+            const { data: comments } = await sb.from('comments').select('*, profiles(username)').eq('game_id', gameId).is('parent_id', null).order('created_at', { ascending: false });
+
+            const commentsList = document.getElementById('commentsList');
+            
+            if (!comments || comments.length === 0) {
+                commentsList.innerHTML = '<p style="color: #6c757d; text-align: center; padding: 20px; font-size: 14px;">첫 댓글을 작성해보세요</p>';
+                return;
+            }
+
+            commentsList.innerHTML = comments.map(comment => `
+                <div class="comment-item">
+                    <div class="comment-header">
+                        <span class="comment-author">${comment.profiles?.username || '알 수 없음'}</span>
+                        <span class="comment-time">${getTimeAgo(comment.created_at)}</span>
+                    </div>
+                    <div class="comment-body">${comment.content}</div>
+                </div>
+            `).join('');
+        }
+
+        function getTimeAgo(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const seconds = Math.floor((now - date) / 1000);
+
+            if (seconds < 60) return '방금 전';
+            if (seconds < 3600) return Math.floor(seconds / 60) + '분 전';
+            if (seconds < 86400) return Math.floor(seconds / 3600) + '시간 전';
+            if (seconds < 604800) return Math.floor(seconds / 86400) + '일 전';
+            return date.toLocaleDateString();
+        }
+
+        async function addComment() {
+            if (!currentUser || !currentGame) {
+                showNotification('먼저 로그인해주세요');
+                return;
+            }
+
+            const content = document.getElementById('commentInput').value;
+            if (!content.trim()) {
+                showNotification('댓글을 입력해주세요');
+                return;
+            }
+
+            const { error } = await sb.from('comments').insert([{
+                game_id: currentGame.id,
+                user_id: currentUser.id,
+                content: content
+            }]);
+
+            if (!error) {
+                document.getElementById('commentInput').value = '';
+                await loadComments(currentGame.id);
+                showNotification('댓글이 게시되었습니다');
+            }
+        }
+
+        async function loadUserProfile() {
+            if (!currentUser) return;
+
+            const { data } = await sb.from('profiles').select('*').eq('id', currentUser.id).single();
+
+            if (data) {
+                document.getElementById('profileUsername').textContent = data.username;
+                document.getElementById('profileBio').textContent = data.bio || '아직 소개가 없습니다';
+                document.getElementById('profileAvatar').textContent = data.username[0].toUpperCase();
+            }
+
+            await loadFollowStats();
+            
+            const myGames = allGames.filter(g => g.user_id === currentUser.id);
+            document.getElementById('profileGameCount').textContent = myGames.length;
+        }
+
+        async function loadFollowStats() {
+            if (!currentUser) return;
+
+            const { data: followers } = await sb.from('follows').select('follower_id').eq('following_id', currentUser.id);
+            const { data: following } = await sb.from('follows').select('following_id').eq('follower_id', currentUser.id);
+
+            const profileStats = document.querySelectorAll('.profile-stats .stat-value');
+            if (profileStats[0]) profileStats[0].textContent = followers?.length || 0;
+            if (profileStats[1]) profileStats[1].textContent = following?.length || 0;
+        }
+
+        async function showFollowers() {
+            if (!currentUser) return;
+
+            const { data: follows } = await sb
+                .from('follows')
+                .select('follower_id, profiles!follows_follower_id_fkey(username)')
+                .eq('following_id', currentUser.id);
+
+            const list = document.getElementById('followersList');
+            
+            if (!follows || follows.length === 0) {
+                list.innerHTML = '<p style="text-align: center; color: #6c757d; padding: 40px; font-size: 14px;">팔로워가 없습니다</p>';
+            } else {
+                list.innerHTML = follows.map(f => `
+                    <div class="user-list-item">
+                        <div class="user-info">
+                            <div class="user-avatar">${f.profiles?.username?.[0]?.toUpperCase() || '?'}</div>
+                            <div>
+                                <div class="user-name">${f.profiles?.username || '알 수 없음'}</div>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" onclick="toggleFollow('${f.follower_id}')">팔로우</button>
+                    </div>
+                `).join('');
+            }
+
+            openModal('followersModal');
+        }
+
+        async function showFollowing() {
+            if (!currentUser) return;
+
+            const { data: follows } = await sb
+                .from('follows')
+                .select('following_id, profiles!follows_following_id_fkey(username)')
+                .eq('follower_id', currentUser.id);
+
+            const list = document.getElementById('followingList');
+            
+            if (!follows || follows.length === 0) {
+                list.innerHTML = '<p style="text-align: center; color: #6c757d; padding: 40px; font-size: 14px;">팔로우한 사용자가 없습니다</p>';
+            } else {
+                list.innerHTML = follows.map(f => `
+                    <div class="user-list-item">
+                        <div class="user-info">
+                            <div class="user-avatar">${f.profiles?.username?.[0]?.toUpperCase() || '?'}</div>
+                            <div>
+                                <div class="user-name">${f.profiles?.username || '알 수 없음'}</div>
+                            </div>
+                        </div>
+                        <button class="btn btn-secondary" onclick="toggleFollow('${f.following_id}')">팔로잉</button>
+                    </div>
+                `).join('');
+            }
+
+            openModal('followingModal');
+        }
+
+        async function toggleFollow(userId) {
+            if (!currentUser) return;
+
+            const { data: existing } = await sb
+                .from('follows')
+                .select('*')
+                .eq('follower_id', currentUser.id)
+                .eq('following_id', userId)
+                .single();
+
+            if (existing) {
+                await sb.from('follows').delete().eq('id', existing.id);
+                showNotification('언팔로우');
+            } else {
+                await sb.from('follows').insert([{
+                    follower_id: currentUser.id,
+                    following_id: userId
+                }]);
+                showNotification('팔로우!');
+            }
+
+            await loadFollowStats();
+        }
+
+        async function openNotifications() {
+            if (!currentUser) {
+                showNotification('먼저 로그인해주세요');
+                openModal('loginModal');
+                return;
+            }
+
+            await loadNotifications();
+            openModal('notificationsModal');
+        }
+
+        async function loadNotifications() {
+            if (!currentUser) return;
+
+            const { data: allRequests } = await sb
+                .from('friendships')
+                .select('*, user1:profiles!friendships_user1_id_fkey(username), user2:profiles!friendships_user2_id_fkey(username)')
+                .eq('status', 'pending');
+
+            const myRequests = allRequests?.filter(req => req.user2_id === currentUser.id) || [];
+
+            const notificationsList = document.getElementById('notificationsList');
+
+            if (myRequests.length === 0) {
+                notificationsList.innerHTML = '<p style="text-align: center; color: #6c757d; padding: 40px; font-size: 14px;">알림이 없습니다</p>';
+                document.getElementById('notificationBtn').innerHTML = '🔔';
+                return;
+            }
+
+            notificationsList.innerHTML = myRequests.map(req => {
+                const requester = req.user1;
+                return `
+                    <div class="user-list-item" style="background: rgba(13, 110, 253, 0.05);">
+                        <div class="user-info">
+                            <div class="user-avatar">${requester?.username?.[0]?.toUpperCase() || '?'}</div>
+                            <div>
+                                <div class="user-name">${requester?.username || '알 수 없음'}</div>
+                                <div class="user-bio">친구 요청을 보냈습니다</div>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn btn-primary" onclick="acceptFriendRequest('${req.id}')">수락</button>
+                            <button class="btn btn-secondary" onclick="rejectFriendRequest('${req.id}')">거절</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            const notifBtn = document.getElementById('notificationBtn');
+            notifBtn.style.position = 'relative';
+            notifBtn.innerHTML = '🔔<span style="position: absolute; top: 2px; right: 2px; width: 8px; height: 8px; background: #0d6efd; border-radius: 50%;"></span>';
+        }
+
+        async function acceptFriendRequest(requestId) {
+            await sb.from('friendships').update({ status: 'accepted' }).eq('id', requestId);
+            showNotification('친구 요청을 수락했습니다');
+            await loadNotifications();
+        }
+
+        async function rejectFriendRequest(requestId) {
+            await sb.from('friendships').delete().eq('id', requestId);
+            showNotification('친구 요청을 거절했습니다');
+            await loadNotifications();
+        }
+
+        async function openUserSearch() {
+            if (!currentUser) {
+                showNotification('먼저 로그인해주세요');
+                openModal('loginModal');
+                return;
+            }
+
+            openModal('userSearchModal');
+            
+            const searchInput = document.getElementById('userSearchInput');
+            searchInput.value = '';
+            searchInput.oninput = async (e) => {
+                const query = e.target.value.trim();
+                if (query.length < 2) {
+                    document.getElementById('userSearchResults').innerHTML = '';
+                    return;
+                }
+
+                const { data: users } = await sb
+                    .from('profiles')
+                    .select('id, username, bio')
+                    .ilike('username', `%${query}%`)
+                    .neq('id', currentUser.id)
+                    .limit(20);
+
+                const results = document.getElementById('userSearchResults');
+
+                if (!users || users.length === 0) {
+                    results.innerHTML = '<p style="text-align: center; color: #6c757d; padding: 20px; font-size: 14px;">사용자를 찾을 수 없습니다</p>';
+                    return;
+                }
+
+                results.innerHTML = users.map(user => `
+                    <div class="user-list-item" onclick="viewUserProfile('${user.id}')">
+                        <div class="user-info">
+                            <div class="user-avatar">${user.username[0].toUpperCase()}</div>
+                            <div>
+                                <div class="user-name">${user.username}</div>
+                                <div class="user-bio">${user.bio || '소개 없음'}</div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            };
+        }
+
+        async function viewUserProfile(userId) {
+            closeModal('userSearchModal');
+            currentViewingUser = userId;
+            
+            const { data: profile } = await sb.from('profiles').select('*').eq('id', userId).single();
+
+            if (!profile) {
+                showNotification('사용자를 찾을 수 없습니다');
+                return;
+            }
+
+            document.getElementById('otherUserProfileTitle').textContent = profile.username;
+            document.getElementById('otherUsername').textContent = profile.username;
+            document.getElementById('otherUserBio').textContent = profile.bio || '소개 없음';
+            document.getElementById('otherUserAvatar').textContent = profile.username[0].toUpperCase();
+
+            const { data: followers } = await sb.from('follows').select('follower_id').eq('following_id', userId);
+            const { data: following } = await sb.from('follows').select('following_id').eq('follower_id', userId);
+
+            document.getElementById('otherFollowerCount').textContent = followers?.length || 0;
+            document.getElementById('otherFollowingCount').textContent = following?.length || 0;
+
+            const { data: games } = await sb.from('games').select('*').eq('user_id', userId);
+            document.getElementById('otherGameCount').textContent = games?.length || 0;
+            displayGames(games || [], 'otherUserGames');
+
+            const { data: isFollowing } = await sb
+                .from('follows')
+                .select('*')
+                .eq('follower_id', currentUser.id)
+                .eq('following_id', userId)
+                .single();
+
+            const followBtn = document.getElementById('followBtn');
+            followBtn.textContent = isFollowing ? '팔로잉' : '팔로우';
+            followBtn.className = isFollowing ? 'btn btn-secondary' : 'btn btn-primary';
+
+            openModal('otherUserProfileModal');
+        }
+
+        async function followUser() {
+            if (!currentViewingUser) return;
+
+            const { data: existing } = await sb
+                .from('follows')
+                .select('*')
+                .eq('follower_id', currentUser.id)
+                .eq('following_id', currentViewingUser)
+                .single();
+
+            if (existing) {
+                await sb.from('follows').delete().eq('id', existing.id);
+                document.getElementById('followBtn').textContent = '팔로우';
+                document.getElementById('followBtn').className = 'btn btn-primary';
+                showNotification('언팔로우');
+            } else {
+                await sb.from('follows').insert([{
+                    follower_id: currentUser.id,
+                    following_id: currentViewingUser
+                }]);
+                document.getElementById('followBtn').textContent = '팔로잉';
+                document.getElementById('followBtn').className = 'btn btn-secondary';
+                showNotification('팔로우!');
+            }
+
+            const { data: followers } = await sb.from('follows').select('follower_id').eq('following_id', currentViewingUser);
+            document.getElementById('otherFollowerCount').textContent = followers?.length || 0;
+        }
+
+        async function sendFriendRequestToUser() {
+            if (!currentViewingUser) return;
+
+            const user1 = currentUser.id < currentViewingUser ? currentUser.id : currentViewingUser;
+            const user2 = currentUser.id < currentViewingUser ? currentViewingUser : currentUser.id;
+
+            const { data: existing } = await sb
+                .from('friendships')
+                .select('*')
+                .eq('user1_id', user1)
+                .eq('user2_id', user2)
+                .single();
+
+            if (existing) {
+                showNotification('이미 요청을 보냈거나 친구입니다');
+                return;
+            }
+
+            const { error } = await sb.from('friendships').insert([{
+                user1_id: user1,
+                user2_id: user2,
+                status: 'pending'
+            }]);
+
+            if (!error) {
+                document.getElementById('friendBtn').textContent = '대기중';
+                document.getElementById('friendBtn').disabled = true;
+                showNotification('친구 요청을 보냈습니다');
+            }
+        }
+
+        async function startDMWithUser() {
+            if (!currentViewingUser) return;
+
+            closeModal('otherUserProfileModal');
+            
+            const { data: profile } = await sb.from('profiles').select('username').eq('id', currentViewingUser).single();
+            
+            if (profile) {
+                currentRecipient = { id: currentViewingUser, username: profile.username };
+                await openDM();
+                await openConversation(currentViewingUser, profile.username);
+            }
+        }
+
+        async function openDM() {
+            if (!currentUser) {
+                showNotification('먼저 로그인해주세요');
+                openModal('loginModal');
+                return;
+            }
+
+            await loadConversations();
+            openModal('dmModal');
+        }
+
+        async function loadConversations() {
+            const { data: messages } = await sb
+                .from('messages')
+                .select('*, sender:profiles!messages_sender_id_fkey(username), recipient:profiles!messages_recipient_id_fkey(username)')
+                .or(`sender_id.eq.${currentUser.id},recipient_id.eq.${currentUser.id}`)
+                .order('created_at', { ascending: false });
+
+            if (!messages || messages.length === 0) {
+                document.getElementById('conversationsList').innerHTML = '<p style="text-align: center; color: #6c757d; padding: 40px; font-size: 14px;">메시지가 없습니다</p>';
+                return;
+            }
+
+            const conversations = new Map();
+            messages.forEach(msg => {
+                const otherId = msg.sender_id === currentUser.id ? msg.recipient_id : msg.sender_id;
+                const otherUser = msg.sender_id === currentUser.id ? msg.recipient : msg.sender;
+                
+                if (!conversations.has(otherId)) {
+                    conversations.set(otherId, {
+                        userId: otherId,
+                        username: otherUser.username,
+                        lastMessage: msg.content,
+                        timestamp: msg.created_at,
+                        unread: msg.recipient_id === currentUser.id && !msg.read
+                    });
+                }
+            });
+
+            const conversationsList = document.getElementById('conversationsList');
+            conversationsList.innerHTML = Array.from(conversations.values()).map(conv => `
+                <div class="user-list-item" onclick="openConversation('${conv.userId}', '${conv.username}')" style="border: none; border-bottom: 1px solid #e9ecef;">
+                    <div class="user-info">
+                        <div class="user-avatar">${conv.username[0].toUpperCase()}</div>
+                        <div style="flex: 1; min-width: 0;">
+                            <div class="user-name">${conv.username}</div>
+                            <div class="user-bio" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${conv.lastMessage}</div>
+                        </div>
+                    </div>
+                    ${conv.unread ? '<div style="width: 8px; height: 8px; border-radius: 50%; background: #0d6efd;"></div>' : ''}
+                </div>
+            `).join('');
+        }
+
+        async function openConversation(userId, username) {
+            currentRecipient = { id: userId, username: username };
+            
+            document.getElementById('dmHeader').style.display = 'block';
+            document.getElementById('messageInputArea').style.display = 'block';
+            document.getElementById('dmRecipientName').textContent = username;
+
+            await loadMessages(userId);
+
+            await sb
+                .from('messages')
+                .update({ read: true })
+                .eq('sender_id', userId)
+                .eq('recipient_id', currentUser.id);
+        }
+
+        async function loadMessages(userId) {
+            const { data: messages } = await sb
+                .from('messages')
+                .select('*, sender:profiles!messages_sender_id_fkey(username)')
+                .or(`and(sender_id.eq.${currentUser.id},recipient_id.eq.${userId}),and(sender_id.eq.${userId},recipient_id.eq.${currentUser.id})`)
+                .order('created_at', { ascending: true });
+
+            const messagesArea = document.getElementById('messagesArea');
+
+            if (!messages || messages.length === 0) {
+                messagesArea.innerHTML = '<p style="text-align: center; color: #6c757d; padding: 40px; font-size: 14px;">대화를 시작해보세요</p>';
+                return;
+            }
+
+            messagesArea.innerHTML = messages.map(msg => {
+                const isMine = msg.sender_id === currentUser.id;
+                return `
+                    <div class="message-item ${isMine ? 'mine' : ''}">
+                        <div class="message-bubble">
+                            <div>${msg.content}</div>
+                            <div class="message-time">${new Date(msg.created_at).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            messagesArea.scrollTop = messagesArea.scrollHeight;
+        }
+
+        async function sendMessage() {
+            if (!currentUser || !currentRecipient) {
+                showNotification('대화를 선택해주세요');
+                return;
+            }
+
+            const input = document.getElementById('messageInput');
+            const content = input.value.trim();
+
+            if (!content) {
+                showNotification('메시지를 입력해주세요');
+                return;
+            }
+
+            const { error } = await sb.from('messages').insert([{
+                sender_id: currentUser.id,
+                recipient_id: currentRecipient.id,
+                content: content,
+                read: false
+            }]);
+
+            if (!error) {
+                input.value = '';
+                await loadMessages(currentRecipient.id);
+                await loadConversations();
+            }
+        }
+
+        async function updateProfile() {
+            const username = document.getElementById('editUsername').value;
+            const bio = document.getElementById('editBio').value;
+
+            const { error } = await sb.from('profiles').update({ username, bio }).eq('id', currentUser.id);
+
+            if (error) {
+                showNotification('업데이트 실패');
+            } else {
+                showNotification('프로필이 업데이트되었습니다');
+                closeModal('editProfileModal');
+                await loadUserProfile();
+            }
+        }
+
+        async function searchGames(query) {
+            if (!query.trim()) {
+                displayGames(allGames, 'allGames');
+                return;
+            }
+
+            const filtered = allGames.filter(game => 
+                game.title.toLowerCase().includes(query.toLowerCase()) ||
+                (game.description && game.description.toLowerCase().includes(query.toLowerCase()))
+            );
+            displayGames(filtered, 'allGames');
+        }
+
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('show');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+        }
+
+        function switchModal(fromModal, toModal) {
+            closeModal(fromModal);
+            setTimeout(() => openModal(toModal), 200);
+        }
+
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            init();
+        });
+
+        document.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && e.target.id === 'messageInput') {
+                sendMessage();
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                const fullscreenDiv = document.querySelector('.fullscreen-mode');
+                if (fullscreenDiv) {
+                    exitFullscreen();
+                }
+            }
+        });
+    </script>
 </body>
 </html>
