@@ -3229,7 +3229,10 @@ function enterFullscreen(){
   if(!currentGame)return;
   // launch_url이 있으면 새 탭으로 바로 이동
   if(currentGame.launch_url){
-    window.open(currentGame.launch_url,'_blank','noopener');
+    let rawUrl = currentGame.launch_url.trim();
+    // 상대경로나 프로토콜 없는 URL이면 https:// 붙이기
+    const absUrl = /^https?:\/\//i.test(rawUrl) ? rawUrl : 'https://' + rawUrl;
+    window.open(absUrl,'_blank','noopener');
     return;
   }
   $('fsTitle').textContent=currentGame.title;
