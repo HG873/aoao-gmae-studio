@@ -2136,7 +2136,7 @@ function buildCddLaunch(){
     if(item.section){
       html+=`<div class="cdd-section-label" style="padding:8px 12px 4px">${item.section}</div>`;
     } else {
-      html+=`<div class="cdd-item url-item" onclick="useLaunchPreset('${item.url}')">
+      html+=`<div class="cdd-item url-item" data-preset-url="${esc(item.url)}" onclick="useLaunchPreset(this.dataset.presetUrl)">
         <span class="cdd-icon">${item.icon}</span>
         <span>${item.label}</span>
         <span class="url-ext">↗ OPEN</span>
@@ -2879,6 +2879,11 @@ function renderGameDetail(){
     });
   });
 
+  // 이전에 보던 탭 복원 (기본값: overview)
+  const tabToRestore = currentTab || 'overview';
+  const activeTabEl = document.querySelector(`.sub-tab[data-tab="${tabToRestore}"]`);
+  if(activeTabEl) activeTabEl.click();
+
   // load friends who play
   loadFriendsWhoPlay(g.id);
 }
@@ -3124,7 +3129,6 @@ async function submitReply(commentId){
   showToast('댓글이 등록되었습니다');
   await loadCommentsForGame(currentGame.id);
   renderGameDetail();
-  setTimeout(()=>document.querySelector('.sub-tab[data-tab="community"]').click(),50);
 }
 
 async function postThread(){
@@ -3137,7 +3141,6 @@ async function postThread(){
   showToast('게시되었습니다');
   await loadCommentsForGame(currentGame.id);
   renderGameDetail();
-  setTimeout(()=>document.querySelector('.sub-tab[data-tab="community"]').click(),50);
 }
 
 async function toggleThreadLike(commentId){
@@ -3230,7 +3233,6 @@ function enterFullscreen(){
   // launch_url이 있으면 새 탭으로 바로 이동
   if(currentGame.launch_url){
     let rawUrl = currentGame.launch_url.trim();
-    // 상대경로나 프로토콜 없는 URL이면 https:// 붙이기
     const absUrl = /^https?:\/\//i.test(rawUrl) ? rawUrl : 'https://' + rawUrl;
     window.open(absUrl,'_blank','noopener');
     return;
