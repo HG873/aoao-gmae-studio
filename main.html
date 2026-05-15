@@ -2639,6 +2639,8 @@ function showEmptyLibrary(){
 async function selectGame(gameId){
   const g=allGames.find(x=>x.id===gameId);
   if(!g)return;
+  // 새 게임 선택 시 탭을 overview로 초기화
+  if(!currentGame || currentGame.id !== gameId) currentTab='overview';
   currentGame=g;
   // 하이라이트 즉시 업데이트
   document.querySelectorAll('.lib-item').forEach(it=>it.classList.toggle('active',it.dataset?.id===gameId||it.onclick?.toString().includes(gameId)));
@@ -3395,7 +3397,7 @@ function renderStore(){
     // featured side list
     $('featuredList').innerHTML=sorted.slice(1,5).map(g=>`
       <div class="mini-card" onclick="selectGame('${g.id}');switchView('library')">
-        <div class="mc-thumb"><img src="${esc(g.thumbnail_url||placeholderImg(g.title))}" onerror="this.src='${placeholderImg(g.title)}'"></div>
+        <div class="mc-thumb"><img src="${esc(g.thumbnail_url||placeholderImg(g.title))}" onerror="this.onerror=null;this.style.display='none'"></div>
         <div>
           <div class="mc-title">${esc(g.title)}</div>
           <div class="mc-meta">${esc((CATS[g.category]||'GAME').toUpperCase())} · ${(g.hearts||0)}♥</div>
@@ -3413,7 +3415,7 @@ function renderStore(){
     return `
       <div class="ts-row" onclick="selectGame('${g.id}');switchView('library')">
         <div class="rank">${String(i+1).padStart(2,'0')}</div>
-        <div class="thumb"><img src="${esc(g.thumbnail_url||placeholderImg(g.title))}" onerror="this.src='${placeholderImg(g.title)}'"></div>
+        <div class="thumb"><img src="${esc(g.thumbnail_url||placeholderImg(g.title))}" onerror="this.onerror=null;this.style.display='none'"></div>
         <div class="info">
           <div class="title">${esc(g.title)}</div>
           <div class="tags"><span>${esc((CATS[g.category]||'GAME').toUpperCase())}</span><span>·</span><span>${(g.hearts||0)} HEARTS</span></div>
@@ -3497,7 +3499,7 @@ async function renderCommunity(){
   const games=allGames.slice(0,12);
   $('comGameStrip').innerHTML=games.map(g=>`
     <div class="com-game-chip" onclick="selectGame('${g.id}');switchView('library')">
-      <div class="ic"><img src="${esc(g.thumbnail_url||placeholderImg(g.title))}" onerror="this.src='${placeholderImg(g.title)}'"></div>
+      <div class="ic"><img src="${esc(g.thumbnail_url||placeholderImg(g.title))}" onerror="this.onerror=null;this.style.display='none'"></div>
       <div class="nm">${esc(g.title)}</div>
     </div>
   `).join('');
