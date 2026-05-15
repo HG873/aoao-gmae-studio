@@ -1644,7 +1644,7 @@
     </div>
 
     <!-- ===== PROFILE ===== -->
-    <div id="view-profile" class="view view-store">
+    <div id="view-profile" class="view view-profile">
       <div class="store-inner" style="max-width:1100px">
         <div class="panel" style="margin-bottom:24px;padding:28px">
           <div style="display:flex;gap:24px;align-items:flex-start">
@@ -2315,6 +2315,12 @@ function timeAgo(d){
   return t.toLocaleDateString('ko-KR');
 }
 
+function isValidUrl(u){
+  if(!u||typeof u!=='string')return false;
+  try{const url=new URL(u);return url.protocol==='https:'||url.protocol==='http:'||url.protocol==='data:';}
+  catch{return false;}
+}
+function safeThumb(url,seed){return isValidUrl(url)?url:placeholderImg(seed);}
 function placeholderImg(seed){
   const colors=['#1f1f24','#26262b','#1a1a1e','#2a2a30'];
   const c=colors[Math.abs(hash(seed))%colors.length];
@@ -2657,7 +2663,7 @@ async function selectGame(gameId){
 
 function renderGameDetailSkeleton(g){
   const cat=CATS[g.category]||'게임';
-  const heroBg=g.thumbnail_url||placeholderImg(g.title);
+  const heroBg=safeThumb(g.thumbnail_url,g.title);
   $('libMain').innerHTML=`
     <section class="hero">
       <div class="hero-bg" style="background-image:url('${esc(heroBg)}')"></div>
@@ -2720,7 +2726,7 @@ function renderGameDetail(){
   const ach=Math.round((achGot/achTotal)*100);
   const lastPlayed=['오늘','어제','3일 전','지난 주','한 달 전'][Math.abs(hash(g.id+'lp'))%5];
   const cat=CATS[g.category]||'게임';
-  const heroBg=g.thumbnail_url||placeholderImg(g.title);
+  const heroBg=safeThumb(g.thumbnail_url,g.title);
 
   $('libMain').innerHTML=`
     <section class="hero">
@@ -3383,7 +3389,7 @@ function renderStore(){
   if(!feat){
     $('storeHero').innerHTML='<div class="empty-pane" style="grid-column:1/-1"><h2>스토어가 비어있습니다</h2></div>';
   }else{
-    $('storeHeroBg').style.backgroundImage=`url('${feat.thumbnail_url||placeholderImg(feat.title)}')`;
+    $('storeHeroBg').style.backgroundImage=`url('${safeThumb(feat.thumbnail_url,feat.title)}')`;
     $('storeHeroCtx').innerHTML=`
       <div class="eyebrow">▸ FEATURED &amp; RECOMMENDED</div>
       <div class="name">${esc(feat.title)}</div>
@@ -3397,7 +3403,7 @@ function renderStore(){
     // featured side list
     $('featuredList').innerHTML=sorted.slice(1,5).map(g=>`
       <div class="mini-card" onclick="selectGame('${g.id}');switchView('library')">
-        <div class="mc-thumb"><img src="${esc(g.thumbnail_url||placeholderImg(g.title))}" onerror="this.onerror=null;this.style.display='none'"></div>
+        <div class="mc-thumb"><img src="${esc(safeThumb(g.thumbnail_url,g.title))}" onerror="this.onerror=null;this.style.display='none'"></div>
         <div>
           <div class="mc-title">${esc(g.title)}</div>
           <div class="mc-meta">${esc((CATS[g.category]||'GAME').toUpperCase())} · ${(g.hearts||0)}♥</div>
@@ -3415,7 +3421,7 @@ function renderStore(){
     return `
       <div class="ts-row" onclick="selectGame('${g.id}');switchView('library')">
         <div class="rank">${String(i+1).padStart(2,'0')}</div>
-        <div class="thumb"><img src="${esc(g.thumbnail_url||placeholderImg(g.title))}" onerror="this.onerror=null;this.style.display='none'"></div>
+        <div class="thumb"><img src="${esc(safeThumb(g.thumbnail_url,g.title))}" onerror="this.onerror=null;this.style.display='none'"></div>
         <div class="info">
           <div class="title">${esc(g.title)}</div>
           <div class="tags"><span>${esc((CATS[g.category]||'GAME').toUpperCase())}</span><span>·</span><span>${(g.hearts||0)} HEARTS</span></div>
@@ -3499,7 +3505,7 @@ async function renderCommunity(){
   const games=allGames.slice(0,12);
   $('comGameStrip').innerHTML=games.map(g=>`
     <div class="com-game-chip" onclick="selectGame('${g.id}');switchView('library')">
-      <div class="ic"><img src="${esc(g.thumbnail_url||placeholderImg(g.title))}" onerror="this.onerror=null;this.style.display='none'"></div>
+      <div class="ic"><img src="${esc(safeThumb(g.thumbnail_url,g.title))}" onerror="this.onerror=null;this.style.display='none'"></div>
       <div class="nm">${esc(g.title)}</div>
     </div>
   `).join('');
